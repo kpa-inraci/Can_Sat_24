@@ -132,7 +132,7 @@ char backup_choice()
           } else {
             Serial.println("Format canceled.");
           }
-        } else if (commandBuffer == "extract") 
+        } else if (commandBuffer == "extract")
         {
           Serial.print("data extract file");
           return 2;
