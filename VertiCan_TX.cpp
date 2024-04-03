@@ -3,36 +3,6 @@
 #include <Adafruit_BME280.h>
 Adafruit_BME280 BME280;
 char sensor_type =0;
-char init_BMx280()
-{
-  if (!init_BMP280()){
-    
-    Serial.print("c'est un BMP");
-    return 'P';
-
-  } else if(init_BME280()){
-    Serial.print("C'est un BME");
-    return 'E';
-  }
-  return 0;
-}
-char init_BME280(void)
-{
-  if (BME280.begin()) 
-  {
-    Serial.println("Erreur connexion capteur BME280");
-    return 1;
-    //while (1);   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ATTENTION BLOQUANT !!!!!!!!!!!!!!!!!!!!!!
-  }
-    /* Default settings from datasheet. */
-   BME280.setSampling(Adafruit_BME280::MODE_NORMAL,    /* Operating Mode. */
-                     Adafruit_BME280::SAMPLING_X2,     /* Temp. oversampling */
-                     Adafruit_BME280::SAMPLING_X16,    /* Pressure oversampling */
-                     Adafruit_BME280::SAMPLING_X16,    /*hum sampling*/
-                     Adafruit_BME280::FILTER_X16,      /* Filtering. */
-                     Adafruit_BME280::STANDBY_MS_500); /* Standby time. */
-  return 0;
-}
 float TMP36_Temperature;
 
 float BMx280_Temperature;
@@ -134,7 +104,36 @@ char init_RFM69(void)
 }
  
 
+char init_BMx280()
+{
+  if (!init_BMP280()){
+    
+    Serial.println("c'est un BMP");
+    return 'P';
 
+  } else if(init_BME280()){
+    Serial.println("C'est un BME");
+    return 'E';
+  }
+  return 0;
+}
+char init_BME280(void)
+{
+  if (BME280.begin()) 
+  {
+    Serial.println("Erreur connexion capteur BME280");
+    return 1;
+    //while (1);   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ATTENTION BLOQUANT !!!!!!!!!!!!!!!!!!!!!!
+  }
+    /* Default settings from datasheet. */
+   BME280.setSampling(Adafruit_BME280::MODE_NORMAL,    /* Operating Mode. */
+                     Adafruit_BME280::SAMPLING_X2,     /* Temp. oversampling */
+                     Adafruit_BME280::SAMPLING_X16,    /* Pressure oversampling */
+                     Adafruit_BME280::SAMPLING_X16,    /*hum sampling*/
+                     Adafruit_BME280::FILTER_X16,      /* Filtering. */
+                     Adafruit_BME280::STANDBY_MS_500); /* Standby time. */
+  return 0;
+}
 char init_BMP280(void)
 {
   if (!BMP280.begin()) {

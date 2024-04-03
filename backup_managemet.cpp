@@ -134,7 +134,7 @@ char backup_choice()
           }
         } else if (commandBuffer == "extract")
         {
-          Serial.print("data extract file");
+          Serial.println("data extract file");
           return 2;
           //extractData();
         } else {
