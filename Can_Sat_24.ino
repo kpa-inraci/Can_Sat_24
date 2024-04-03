@@ -5,6 +5,7 @@ extern unsigned long Time_ms;  // "temps" en milliseconde depuis le dernier rese
 
 //wesh, jesuis figué
 //moi aussi je suis nez avant toi !!!
+//bjr quentin
 
 void setup() 
 {
