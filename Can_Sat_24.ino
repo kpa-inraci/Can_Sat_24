@@ -8,6 +8,7 @@ int compteur_donne = 0;
 void setup() {
   Serial.begin(115200);
   Serial1.begin(115200);
+
   init_backup_management();
   Wire.begin();
   mpu.initialize();
@@ -21,8 +22,8 @@ void setup() {
   Time_ms = millis();
 }
 char status = 0;
-void loop() {
-  Serial1.write(178);
+void loop() 
+{
   status = backup_choice();
   if (millis() >= Time_ms + 10) {  //prends une mesure toute les 10ms
     get_data();
@@ -30,25 +31,29 @@ void loop() {
     compteur_regu++;
     compteur_donne++;
   }
-  if (compteur_regu >= 10) {
-    compteur_regu = 0;
-    //regulation
-
-  }
+ 
 
 
-  switch (status) {
+  switch (status) 
+  {
     case VERTICAN_format_file:
       formatMemory();
       Packetnum = 0;
       break;
     case VERTICAN_extract_file:
       extractData();
-      Serial.println("data has been extracted enter something to run");
-      while (1) {
-        if (Serial.available()) { break; }
+    
+      while (!Serial.available())
+      {
+        for (uint8_t i = 0; i < 60; i++)
+        {
+          delay(5);
+          if(Serial.available())
+            break;
+        }
+        Serial.println("data has been extracted enter something to run");
       }
-      break;
+      break; 
     case VERTICAN_run:
       if (compteur_donne >= 100) {
         Packetnum++;
@@ -56,5 +61,10 @@ void loop() {
         compteur_donne = 0;
       }
       break;
+  }
+   if (compteur_regu >= 10) 
+   {
+    compteur_regu = 0;
+    //regulation
   }
 }

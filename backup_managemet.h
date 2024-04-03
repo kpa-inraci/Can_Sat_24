@@ -9,7 +9,7 @@ extern Adafruit_SPIFlash flash;
 extern FatFileSystem fatfs;
 
 
-#define FILE_NAME      "data.csv"
+#define FILE_NAME "data.csv"
 
 bool confirmFormat(void);
 char init_backup_management(void);

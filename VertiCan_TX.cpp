@@ -212,6 +212,7 @@ String creerRadioPacket(int Packetnum, long Time_ms, float TMP36_Temperature, fl
 char saveToFlash(uint16_t Packetnum, unsigned long Time_ms, float TMP36_Temperature, float BMP280_Temperature, float BMP280_Pression, float BMP280_AltitudeApprox, float ACCEL_XANGLE, float ACCEL_YANGLE, float ACCEL_ZANGLE, float x_out, float y_out, float z_out) {
     File dataFile = fatfs.open(FILE_NAME, FILE_WRITE); // Ouvre le fichier pour l'écriture
     if (dataFile) { // Vérifie si l'ouverture du fichier a réussi
+        
         dataFile.print(Packetnum);           dataFile.print(",");
         dataFile.print(Time_ms);             dataFile.print(",");
         dataFile.print(TMP36_Temperature);   dataFile.print(",");
@@ -236,15 +237,15 @@ void sendToSerial(uint16_t Packetnum,unsigned long Time_ms,float TMP36_Temperatu
   float BMP280_Temperature, float BMP280_Pression,  float BMP280_AltitudeApprox,
   float ACCEL_XANGLE, float ACCEL_YANGLE, float ACCEL_ZANGLE,
   float x_out, float y_out, float z_out) {
-    Serial.printf("Packetnum :%d",Packetnum);
-    Serial.printf("Time_ms :%d",Time_ms);
-    Serial.printf("TMP36_Temperature = %f",TMP36_Temperature);
-    Serial.printf("   BMP280_Temperature = %f",BMP280_Temperature);
-    Serial.printf("   BMP280_Pression = %fPa",BMP280_Pression);
-    Serial.printf("   BMP280_Altitude approximative = %fm",BMP280_AltitudeApprox);
-    Serial.printf("   x angle :%f acc:%f",ACCEL_XANGLE,x_out);
-    Serial.printf("   y angle :%f acc:%f",ACCEL_YANGLE,y_out);
-    Serial.printf("   z angle :%f acc:%f\n",ACCEL_ZANGLE,z_out);
+    Serial.printf("Packet :%8d",Packetnum);
+    Serial.printf(" Time_ms :%8d",Time_ms);
+    Serial.printf(" TMP36_T° = %4.1f",TMP36_Temperature);
+    Serial.printf("   BMx280_T° = %4.1f",BMP280_Temperature);
+    Serial.printf("   BMx280_P° = %10.3fPa",BMP280_Pression);
+    Serial.printf("   BMx280_Alti= %6.2fm",BMP280_AltitudeApprox);
+    Serial.printf("   Xa :%6.2f° ac:%6.3f",ACCEL_XANGLE,x_out);
+    Serial.printf("   Ya :%6.2f° ac:%6.3f",ACCEL_YANGLE,y_out);
+    Serial.printf("   Za :%6.2f° ac:%6.3f\n",ACCEL_ZANGLE,z_out);
     #ifdef printSerial_radiopack 
       Serial.print("Radiopacket : ");
       Serial.print(Radiopacket);
