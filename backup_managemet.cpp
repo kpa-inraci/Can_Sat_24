@@ -56,18 +56,20 @@ bool confirmFormat()
 }
 
 
-void init_backup_management()
+char init_backup_management()
 {
   Serial.println("start init backup soft");
   if (!flash.begin())
   {
     Serial.println("Error, failed to initialize flash chip!");
-    while(1); //TODO fixe me
+    //while(1); //TODO fixe me
+    return 1;
   }
   Serial.print("Flash chip JEDEC ID: 0x"); Serial.println(flash.getJEDECID(), HEX);
 
   Serial.setTimeout(30000);
   Serial.println("Type 'format' to format the flash memory or 'extract' to extract data.");
+  return 0;
 }
 
 

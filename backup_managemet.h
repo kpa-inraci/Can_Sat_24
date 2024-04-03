@@ -12,7 +12,7 @@ extern FatFileSystem fatfs;
 #define FILE_NAME      "data.csv"
 
 bool confirmFormat(void);
-void init_backup_management(void);
+char init_backup_management(void);
 void formatMemory(void);
 void extractData(void); 
 char backup_choice(void);

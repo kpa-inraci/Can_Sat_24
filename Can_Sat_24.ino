@@ -8,7 +8,6 @@ int compteur_donne = 0;
 void setup() {
   Serial.begin(115200);
   Serial1.begin(115200);
-  delay(2000);
   init_backup_management();
   Wire.begin();
   mpu.initialize();
