@@ -3,6 +3,8 @@
 extern char sensor_type;
 extern unsigned long Time_ms;  // "temps" en milliseconde depuis le dernier reset du uP
 
+//wesh, jesuis figué
+
 
 void setup() 
 {
