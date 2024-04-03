@@ -27,13 +27,15 @@ void loop()
 {
  
   status=backup_choice();
-
- 
-  if (millis() >= Time_ms + 100) 
-  {
-    Time_ms = millis();  
+  if (millis() >= Time_ms + 10)
+  { //prends une mesure toute les 10ms
     get_data();  
-    Packetnum++;   
+    Packetnum++;
+  }
+ 
+  if (millis() >= Time_ms + 1000) //envois les données toutes les secondes
+  {
+    Time_ms = millis();     
 
     switch (status)
     {
