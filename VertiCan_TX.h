@@ -13,9 +13,7 @@
 
 #include "MPU6050.h"
 
-#define VERTICAN_format_file 1
-#define VERTICAN_extract_file 2
-#define VERTICAN_run 0
+
 
 
 // Déclarations des #define originaux
@@ -29,6 +27,12 @@
 #define SERVO_Pin_2 12
 #define FILE_NAME "data.csv"  
 #define ALTITUDE_REF 1024.00  
+#define VERTICAN_format_file 1
+#define VERTICAN_extract_file 2
+#define VERTICAN_run 0
+#define consigne_x 0
+#define consigne_y -90
+#define consigne_z -90
 #define backup_file
 //#define printSerial_radiopack
 
@@ -39,6 +43,7 @@ extern float x_out, y_out, z_out;
 extern int Packetnum;
 extern unsigned long Time_ms;
 extern String Radiopacket;
+extern float altitude_max;
 
 
 
@@ -61,14 +66,13 @@ char init_flash(void);
 char init_BMP280(void);
 char get_BMP280(void);
 void sendToSerial(uint16_t Packetnum,unsigned long Time_ms,float TMP36_Temperature,
-  float BMP280_Temperature, float BMP280_Pression,  float BMP280_AltitudeApprox,  float BMx280_Hum, 
+  float BMP280_Temperature, float BMP280_Pression,  float BMP280_AltitudeApprox,float altitude_max, float BMx280_Hum, 
   float ACCEL_XANGLE, float ACCEL_YANGLE, float ACCEL_ZANGLE,
   float x_out, float y_out, float z_out);
 char saveToFlash(uint16_t Packetnum, unsigned long Time_ms, float TMP36_Temperature, 
-  float BMP280_Temperature, float BMP280_Pression, float BMP280_AltitudeApprox, float BMx280_Hum,  
+  float BMP280_Temperature, float BMP280_Pression, float BMP280_AltitudeApprox,float altitude_max, float BMx280_Hum,  
   float ACCEL_XANGLE, float ACCEL_YANGLE, float ACCEL_ZANGLE, float x_out, float y_out, float z_out);
-String creerRadioPacket(int Packetnum, long Time_ms, float TMP36_Temperature, 
-  float BMP280_Temperature, float BMP280_Pression, float BMP280_AltitudeApprox, float BMx280_Hum,  
+String creerRadioPacket(int Packetnum, long Time_ms, float TMP36_Temperature, float BMP280_Temperature, float BMP280_Pression, float BMP280_AltitudeApprox,float altitude_max, float BMx280_Hum,  
   float ACCEL_XANGLE, float ACCEL_YANGLE, float ACCEL_ZANGLE, float x_out, float y_out, float z_out);
 void get_data(void);
 void buzzer_toggle(unsigned int time); // Ajout de la déclaration de la fonction buzzer_toggle
