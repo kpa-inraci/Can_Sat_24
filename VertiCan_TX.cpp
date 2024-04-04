@@ -50,15 +50,15 @@ void initPinIO(int pin, int mode, int value) {
 
 void send_all_data(void) 
 {
-/*
- Radiopacket = creerRadioPacket(Packetnum, Time_ms, 
-                                  TMP36_Temperature, 
-                                  BMx280_Temperature, BMx280_Pression, BMx280_AltitudeApprox ,altitude_max, BMx280_Hum, 
-                                  ACCEL_XANGLE, ACCEL_YANGLE, ACCEL_ZANGLE, x_out, y_out, z_out);
-  */
+
+ Radiopacket = creerRadioPacket(Packetnum,Time_ms, 
+                  TMP36_Temperature, 
+                  BMx280_Temperature, BMx280_Pression, BMx280_AltitudeApprox,altitude_max, BMx280_Hum, 
+                  ACCEL_XANGLE, ACCEL_YANGLE, ACCEL_ZANGLE, x_out, y_out, z_out);
+  
      // Sauvegarde des mesures dans la mémoire flash
     #ifdef backup_file
-      saveToFlash(Packetnum, Time_ms, 
+      saveToFlash(Packetnum,Time_ms, 
                   TMP36_Temperature, 
                   BMx280_Temperature, BMx280_Pression, BMx280_AltitudeApprox,altitude_max, BMx280_Hum, 
                   ACCEL_XANGLE, ACCEL_YANGLE, ACCEL_ZANGLE, x_out, y_out, z_out);
@@ -69,11 +69,13 @@ void send_all_data(void)
     // Envoi du radiopacket à la station de base. ATTENTION : bloquant si module radio rrfm69 absent !!
     rfm69.send((uint8_t *)(Radiopacket.c_str()), Radiopacket.length());
     rfm69.waitPacketSent();
+    
 
     sendToSerial(Packetnum,Time_ms, 
                   TMP36_Temperature, 
                   BMx280_Temperature, BMx280_Pression, BMx280_AltitudeApprox,altitude_max, BMx280_Hum, 
                   ACCEL_XANGLE, ACCEL_YANGLE, ACCEL_ZANGLE, x_out, y_out, z_out);
+                  
 }
 
 char init_RFM69(void)
@@ -207,7 +209,11 @@ char init_flash(void)
   return 0;
 }
 
-String creerRadioPacket(int Packetnum, long Time_ms, float TMP36_Temperature, float BMP280_Temperature, float BMP280_Pression, float BMP280_AltitudeApprox, float BMx280_Hum, float ACCEL_XANGLE, float ACCEL_YANGLE, float ACCEL_ZANGLE, float x_out, float y_out, float z_out) {
+String creerRadioPacket (uint16_t Packetnum,unsigned long Time_ms,float TMP36_Temperature,
+  float BMP280_Temperature, float BMP280_Pression,  float BMP280_AltitudeApprox,float altitude_max, float BMx280_Hum,
+  float ACCEL_XANGLE, float ACCEL_YANGLE, float ACCEL_ZANGLE,
+  float x_out, float y_out, float z_out)
+{
     String Radiopacket = String(Packetnum) + "," +
                          String(Time_ms) + "," +
                          String(TMP36_Temperature) + "," +
@@ -224,7 +230,11 @@ String creerRadioPacket(int Packetnum, long Time_ms, float TMP36_Temperature, fl
 
     return Radiopacket;
 }
-char saveToFlash(uint16_t Packetnum, unsigned long Time_ms, float TMP36_Temperature, float BMP280_Temperature, float BMP280_Pression, float BMP280_AltitudeApprox,  float BMx280_Hum, float ACCEL_XANGLE, float ACCEL_YANGLE, float ACCEL_ZANGLE, float x_out, float y_out, float z_out) {
+char saveToFlash(uint16_t Packetnum,unsigned long Time_ms,float TMP36_Temperature,
+                float BMP280_Temperature, float BMP280_Pression, float BMP280_AltitudeApprox,float altitude_max, float BMx280_Hum, 
+                float ACCEL_XANGLE, float ACCEL_YANGLE, float ACCEL_ZANGLE,
+                float x_out, float y_out, float z_out)
+{
     File dataFile = fatfs.open(FILE_NAME, FILE_WRITE); // Ouvre le fichier pour l'écriture
     if (dataFile) { // Vérifie si l'ouverture du fichier a réussi
         
