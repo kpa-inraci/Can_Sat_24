@@ -9,6 +9,8 @@
 #include <Adafruit_SPIFlash.h>
 #include <Servo.h>
 #include <RH_RF69.h>  // Librairie du module radio RFM69
+#include <Adafruit_BME280.h>
+
 #include "MPU6050.h"
 
 #define VERTICAN_format_file 1

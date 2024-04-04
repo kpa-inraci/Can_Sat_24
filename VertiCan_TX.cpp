@@ -1,10 +1,8 @@
 #include "VertiCan_TX.h"
 #include "backup_managemet.h"
-#include <Adafruit_BME280.h>
 #define consigne_x 0
 #define consigne_y -90
 #define consigne_z -90
-Adafruit_BME280 BME280;
 char sensor_type =0;
 float TMP36_Temperature;
 float BMx280_Hum = 0;
@@ -26,7 +24,7 @@ String Radiopacket;     // Paquet de donnée qui sera transmis à la station de 
 //************* DEFINITION DES OBJETS ************
 RH_RF69 rfm69(RFM69_CS, RFM69_INT);
 Adafruit_BMP280 BMP280;
-
+Adafruit_BME280 BME280;
 Servo Servomoteur1;
 Servo Servomoteur2;
 extern MPU6050 mpu;
