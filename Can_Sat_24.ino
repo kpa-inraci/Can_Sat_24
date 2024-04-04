@@ -65,7 +65,7 @@ void loop()
   }
    if (compteur_regu >= 10) 
    {
-    //erreur objectif
+    //erreur et objectif
     compteur_regu = 0;
     //regulation
   }
