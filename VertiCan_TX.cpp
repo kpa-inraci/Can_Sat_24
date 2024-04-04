@@ -1,13 +1,19 @@
 #include "VertiCan_TX.h"
 #include "backup_managemet.h"
 #include <Adafruit_BME280.h>
+#define consigne_x 0
+#define consigne_y -90
+#define consigne_z -90
 Adafruit_BME280 BME280;
 char sensor_type =0;
 float TMP36_Temperature;
-
+float BMx280_Hum = 0;
 float BMx280_Temperature;
 float BMx280_Pression;
 float BMx280_AltitudeApprox;
+float erreur_x = 0;
+float erreur_y = 0;
+float erreur_z = 0;
 unsigned long Time_ms;  // "temps" en milliseconde depuis le dernier reset du uP
 int Packetnum = 0;      // Numéro du paquet de donnée. Sera incrémenté à chaque envoi
 String Radiopacket;     // Paquet de donnée qui sera transmis à la station de base
@@ -49,14 +55,14 @@ void send_all_data(void)
 {
  Radiopacket = creerRadioPacket(Packetnum, Time_ms, 
                                   TMP36_Temperature, 
-                                  BMx280_Temperature, BMx280_Pression, BMx280_AltitudeApprox, 
+                                  BMx280_Temperature, BMx280_Pression, BMx280_AltitudeApprox, BMx280_Hum, 
                                   ACCEL_XANGLE, ACCEL_YANGLE, ACCEL_ZANGLE, x_out, y_out, z_out);
   
      // Sauvegarde des mesures dans la mémoire flash
     #ifdef backup_file
       saveToFlash(Packetnum, Time_ms, 
                   TMP36_Temperature, 
-                  BMx280_Temperature, BMx280_Pression, BMx280_AltitudeApprox, 
+                  BMx280_Temperature, BMx280_Pression, BMx280_AltitudeApprox, BMx280_Hum, 
                   ACCEL_XANGLE, ACCEL_YANGLE, ACCEL_ZANGLE, x_out, y_out, z_out);
     #else
       Serial.println("NO Flash backUP !!!!!!!!!");
@@ -68,7 +74,7 @@ void send_all_data(void)
 
     sendToSerial(Packetnum,Time_ms, 
                   TMP36_Temperature, 
-                  BMx280_Temperature, BMx280_Pression, BMx280_AltitudeApprox, 
+                  BMx280_Temperature, BMx280_Pression, BMx280_AltitudeApprox, BMx280_Hum, 
                   ACCEL_XANGLE, ACCEL_YANGLE, ACCEL_ZANGLE, x_out, y_out, z_out);
 }
 
@@ -170,6 +176,10 @@ char init_flash(void)
    TMP36_Temperature = (((analogRead(TMP36_Pin) * 3.3) / 1024) - 0.5) * 100;
    get_BMx280(sensor_type);
    Get_Accel_Angles();
+   erreur_x = ACCEL_XANGLE - consigne_x;
+   erreur_y = ACCEL_YANGLE - consigne_y;
+   erreur_z = ACCEL_ZANGLE - consigne_z;
+   
  }
  void get_BMx280(char modele)
  {
@@ -183,6 +193,7 @@ char init_flash(void)
   BMx280_Temperature = BME280.readTemperature();
   BMx280_Pression = BME280.readPressure();
   BMx280_AltitudeApprox = BME280.readAltitude(ALTITUDE_REF);
+  BMx280_Hum = BME280.readHumidity();
   return 0;
 }
  char get_BMP280(void)
@@ -193,13 +204,14 @@ char init_flash(void)
   return 0;
 }
 
-String creerRadioPacket(int Packetnum, long Time_ms, float TMP36_Temperature, float BMP280_Temperature, float BMP280_Pression, float BMP280_AltitudeApprox, float ACCEL_XANGLE, float ACCEL_YANGLE, float ACCEL_ZANGLE, float x_out, float y_out, float z_out) {
+String creerRadioPacket(int Packetnum, long Time_ms, float TMP36_Temperature, float BMP280_Temperature, float BMP280_Pression, float BMP280_AltitudeApprox, float BMx280_Hum, float ACCEL_XANGLE, float ACCEL_YANGLE, float ACCEL_ZANGLE, float x_out, float y_out, float z_out) {
     String Radiopacket = String(Packetnum) + "," +
                          String(Time_ms) + "," +
                          String(TMP36_Temperature) + "," +
                          String(BMP280_Temperature) + "," +
                          String(BMP280_Pression) + "," +
                          String(BMP280_AltitudeApprox) + "," +
+                         String(BMx280_Hum) + "," +
                          String(ACCEL_XANGLE) + "," +
                          String(ACCEL_YANGLE) + "," +
                          String(ACCEL_ZANGLE) + "," +
@@ -209,7 +221,7 @@ String creerRadioPacket(int Packetnum, long Time_ms, float TMP36_Temperature, fl
 
     return Radiopacket;
 }
-char saveToFlash(uint16_t Packetnum, unsigned long Time_ms, float TMP36_Temperature, float BMP280_Temperature, float BMP280_Pression, float BMP280_AltitudeApprox, float ACCEL_XANGLE, float ACCEL_YANGLE, float ACCEL_ZANGLE, float x_out, float y_out, float z_out) {
+char saveToFlash(uint16_t Packetnum, unsigned long Time_ms, float TMP36_Temperature, float BMP280_Temperature, float BMP280_Pression, float BMP280_AltitudeApprox,  float BMx280_Hum, float ACCEL_XANGLE, float ACCEL_YANGLE, float ACCEL_ZANGLE, float x_out, float y_out, float z_out) {
     File dataFile = fatfs.open(FILE_NAME, FILE_WRITE); // Ouvre le fichier pour l'écriture
     if (dataFile) { // Vérifie si l'ouverture du fichier a réussi
         
@@ -219,6 +231,7 @@ char saveToFlash(uint16_t Packetnum, unsigned long Time_ms, float TMP36_Temperat
         dataFile.print(BMP280_Temperature);  dataFile.print(",");
         dataFile.print(BMP280_Pression);     dataFile.print(",");
         dataFile.print(BMP280_AltitudeApprox); dataFile.print(",");
+        dataFile.print(BMx280_Hum);          dataFile.print(",");
         dataFile.print(ACCEL_XANGLE);        dataFile.print(",");
         dataFile.print(ACCEL_YANGLE);        dataFile.print(",");
         dataFile.print(ACCEL_ZANGLE);        dataFile.print(",");
@@ -234,7 +247,7 @@ char saveToFlash(uint16_t Packetnum, unsigned long Time_ms, float TMP36_Temperat
     }
 }
 void sendToSerial(uint16_t Packetnum,unsigned long Time_ms,float TMP36_Temperature,
-  float BMP280_Temperature, float BMP280_Pression,  float BMP280_AltitudeApprox,
+  float BMP280_Temperature, float BMP280_Pression,  float BMP280_AltitudeApprox,  float BMx280_Hum,
   float ACCEL_XANGLE, float ACCEL_YANGLE, float ACCEL_ZANGLE,
   float x_out, float y_out, float z_out) {
     Serial.printf("Packet :%8d",Packetnum);
@@ -243,6 +256,7 @@ void sendToSerial(uint16_t Packetnum,unsigned long Time_ms,float TMP36_Temperatu
     Serial.printf("   BMx280_T° = %4.1f",BMP280_Temperature);
     Serial.printf("   BMx280_P° = %10.3fPa",BMP280_Pression);
     Serial.printf("   BMx280_Alti= %6.2fm",BMP280_AltitudeApprox);
+    Serial.printf("   BMx280_Hum = %4.1f", BMx280_Hum);
     Serial.printf("   Xa :%6.2f° ac:%6.3f",ACCEL_XANGLE,x_out);
     Serial.printf("   Ya :%6.2f° ac:%6.3f",ACCEL_YANGLE,y_out);
     Serial.printf("   Za :%6.2f° ac:%6.3f\n",ACCEL_ZANGLE,z_out);

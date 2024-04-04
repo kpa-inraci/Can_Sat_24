@@ -1,6 +1,8 @@
 #include "VertiCan_TX.h"
 #include "backup_managemet.h"
 extern char sensor_type;
+extern float erreur_x, erreur_y, erreur_z;
+extern float ACCEL_XANGLE, ACCEL_YANGLE, ACCEL_ZANGLE;
 extern unsigned long Time_ms;  // "temps" en milliseconde depuis le dernier reset du uP
 int compteur_regu = 0;
 int compteur_donne = 0;
@@ -27,6 +29,9 @@ void loop()
   status = backup_choice();
   if (millis() >= Time_ms + 10) {  //prends une mesure toute les 10ms
     get_data();
+    Serial.printf("ex =%3.1f, ax =%3.1f", erreur_x, ACCEL_XANGLE);
+    Serial.printf("ey =%3.1f, ay =%3.1f", erreur_y, ACCEL_YANGLE);
+    Serial.printf("ez =%3.1f, az =%3.1f\n", erreur_z, ACCEL_ZANGLE);
     Time_ms = millis();
     compteur_regu++;
     compteur_donne++;
@@ -58,7 +63,7 @@ void loop()
     case VERTICAN_run:
       if (compteur_donne >= 100) {
         Packetnum++;
-        send_all_data();
+        //send_all_data();
         compteur_donne = 0;
       }
       break;

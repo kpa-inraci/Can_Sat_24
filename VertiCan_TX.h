@@ -31,10 +31,7 @@
 //#define printSerial_radiopack
 
 // Déclarations des variables et des fonctions externes
-extern float TMP36_Temperature;
-extern float BMP280_Temperature;
-extern float BMP280_Pression;
-extern float BMP280_AltitudeApprox;
+extern float TMP36_Temperature, BMP280_Temperature, BMP280_Pression, BMP280_AltitudeApprox, BMx280_Hum;
 extern float ACCEL_XANGLE, ACCEL_YANGLE, ACCEL_ZANGLE;
 extern float x_out, y_out, z_out;
 extern int Packetnum;
@@ -62,14 +59,14 @@ char init_flash(void);
 char init_BMP280(void);
 char get_BMP280(void);
 void sendToSerial(uint16_t Packetnum,unsigned long Time_ms,float TMP36_Temperature,
-  float BMP280_Temperature, float BMP280_Pression,  float BMP280_AltitudeApprox,
+  float BMP280_Temperature, float BMP280_Pression,  float BMP280_AltitudeApprox,  float BMx280_Hum, 
   float ACCEL_XANGLE, float ACCEL_YANGLE, float ACCEL_ZANGLE,
   float x_out, float y_out, float z_out);
 char saveToFlash(uint16_t Packetnum, unsigned long Time_ms, float TMP36_Temperature, 
-  float BMP280_Temperature, float BMP280_Pression, float BMP280_AltitudeApprox, 
+  float BMP280_Temperature, float BMP280_Pression, float BMP280_AltitudeApprox, float BMx280_Hum,  
   float ACCEL_XANGLE, float ACCEL_YANGLE, float ACCEL_ZANGLE, float x_out, float y_out, float z_out);
 String creerRadioPacket(int Packetnum, long Time_ms, float TMP36_Temperature, 
-  float BMP280_Temperature, float BMP280_Pression, float BMP280_AltitudeApprox, 
+  float BMP280_Temperature, float BMP280_Pression, float BMP280_AltitudeApprox, float BMx280_Hum,  
   float ACCEL_XANGLE, float ACCEL_YANGLE, float ACCEL_ZANGLE, float x_out, float y_out, float z_out);
 void get_data(void);
 void buzzer_toggle(unsigned int time); // Ajout de la déclaration de la fonction buzzer_toggle
