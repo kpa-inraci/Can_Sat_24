@@ -68,16 +68,19 @@ char init_BMP280(void);
 char get_BMP280(void);
 void sendToSerial (uint16_t Packetnum,unsigned long Time_ms,float TMP36_Temperature,
   float BMP280_Temperature, float BMP280_Pression, float BMP280_AltitudeApprox,float altitude_max, float BMx280_Hum, 
-  float ACCEL_XANGLE, float ACCEL_YANGLE, float ACCEL_ZANGLE,
-  float x_out, float y_out, float z_out, float erreur_x, float erreur_y, float erreur_z);
+  float ACCEL_XANGLE, float erreur_x, float x_out, 
+  float ACCEL_YANGLE, float erreur_y,  float y_out,
+  float ACCEL_ZANGLE, float erreur_z, float z_out);
 char saveToFlash  (uint16_t Packetnum, unsigned long Time_ms, float TMP36_Temperature, 
   float BMP280_Temperature, float BMP280_Pression, float BMP280_AltitudeApprox,float altitude_max, float BMx280_Hum,  
-  float ACCEL_XANGLE, float ACCEL_YANGLE, float ACCEL_ZANGLE, 
-  float x_out, float y_out, float z_out, float erreur_x, float erreur_y, float erreur_z);
+  float ACCEL_XANGLE, float erreur_x, float x_out, 
+  float ACCEL_YANGLE, float erreur_y,  float y_out,
+  float ACCEL_ZANGLE, float erreur_z, float z_out);
 String creerRadioPacket(uint16_t Packetnum,unsigned long Time_ms,float TMP36_Temperature,
   float BMP280_Temperature, float BMP280_Pression, float BMP280_AltitudeApprox,float altitude_max, float BMx280_Hum, 
-  float ACCEL_XANGLE, float ACCEL_YANGLE, float ACCEL_ZANGLE,
-  float x_out, float y_out, float z_out, float erreur_x, float erreur_y, float erreur_z);
+  float ACCEL_XANGLE, float erreur_x, float x_out, 
+  float ACCEL_YANGLE, float erreur_y,  float y_out,
+  float ACCEL_ZANGLE, float erreur_z, float z_out);
 void get_data(void);
 void buzzer_toggle(unsigned int time); // Ajout de la déclaration de la fonction buzzer_toggle
 void send_all_data(void);
