@@ -225,6 +225,7 @@ String creerRadioPacket (uint16_t Packetnum,unsigned long Time_ms,float TMP36_Te
                          String(BMP280_Temperature) + "," +
                          String(BMP280_Pression) + "," +
                          String(BMP280_AltitudeApprox) + "," +
+                         String(altitude_max) + "," +
                          String(BMx280_Hum) + ", @" +
                          String(ACCEL_XANGLE) + "," +
                          String(erreur_x) + "," +
@@ -253,6 +254,7 @@ char saveToFlash(uint16_t Packetnum,unsigned long Time_ms,float TMP36_Temperatur
         dataFile.print(BMP280_Temperature);    dataFile.print(",");
         dataFile.print(BMP280_Pression);       dataFile.print(",");
         dataFile.print(BMP280_AltitudeApprox); dataFile.print(",");
+        dataFile.print(altitude_max);          dataFile.print(",");
         dataFile.print(BMx280_Hum);            dataFile.print(",@");
         dataFile.print(ACCEL_XANGLE);          dataFile.print(",");
         dataFile.print(erreur_x);              dataFile.print(",");
