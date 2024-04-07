@@ -219,13 +219,13 @@ String creerRadioPacket (uint16_t Packetnum,unsigned long Time_ms,float TMP36_Te
   float ACCEL_YANGLE, float erreur_y,  float y_out,
   float ACCEL_ZANGLE, float erreur_z, float z_out)
 {
-    String Radiopacket = String(Packetnum) + "," +
+    String Radiopacket = "#" + String(Packetnum) + "," +
                          String(Time_ms) + "," +
                          String(TMP36_Temperature) + "," +
                          String(BMP280_Temperature) + "," +
                          String(BMP280_Pression) + "," +
                          String(BMP280_AltitudeApprox) + "," +
-                         String(BMx280_Hum) + ", a" +
+                         String(BMx280_Hum) + ", @" +
                          String(ACCEL_XANGLE) + "," +
                          String(erreur_x) + "," +
                          String(x_out) + "," +
@@ -234,7 +234,7 @@ String creerRadioPacket (uint16_t Packetnum,unsigned long Time_ms,float TMP36_Te
                          String(y_out) + "," +
                          String(ACCEL_ZANGLE) + "," +
                          String(erreur_x) + "," +
-                         String(z_out) + ",\r\n";
+                         String(z_out) + "$,\r\n";
 
     return Radiopacket;
 }
@@ -246,14 +246,14 @@ char saveToFlash(uint16_t Packetnum,unsigned long Time_ms,float TMP36_Temperatur
 {
     File dataFile = fatfs.open(FILE_NAME, FILE_WRITE); // Ouvre le fichier pour l'écriture
     if (dataFile) { // Vérifie si l'ouverture du fichier a réussi
-        
+        dataFile.print("#");
         dataFile.print(Packetnum);             dataFile.print(",");
         dataFile.print(Time_ms);               dataFile.print(",");
         dataFile.print(TMP36_Temperature);     dataFile.print(",");
         dataFile.print(BMP280_Temperature);    dataFile.print(",");
         dataFile.print(BMP280_Pression);       dataFile.print(",");
         dataFile.print(BMP280_AltitudeApprox); dataFile.print(",");
-        dataFile.print(BMx280_Hum);            dataFile.print(",a");
+        dataFile.print(BMx280_Hum);            dataFile.print(",@");
         dataFile.print(ACCEL_XANGLE);          dataFile.print(",");
         dataFile.print(erreur_x);              dataFile.print(",");
         dataFile.print(x_out);                 dataFile.print(",");
@@ -262,7 +262,7 @@ char saveToFlash(uint16_t Packetnum,unsigned long Time_ms,float TMP36_Temperatur
         dataFile.print(y_out);                 dataFile.print(",");
         dataFile.print(ACCEL_ZANGLE);          dataFile.print(",");
         dataFile.print(erreur_z);              dataFile.print(",");
-        dataFile.print(z_out);                 dataFile.println();
+        dataFile.print(z_out);                 dataFile.println("$");
 
         dataFile.close(); // Ferme le fichier
         return 0;
