@@ -107,51 +107,56 @@ void extractData() {
   }
 
 }
-char backup_choice()
-{
+char backup_choice() {
   static String commandBuffer = ""; // Variable statique pour stocker la commande en cours de saisie
 
-  while (Serial.available() > 0) {
-    char receivedChar = Serial.read();
+  while (Serial.available() > 0 || commandBuffer.length() > 0) {
+    // Lire les caractères disponibles depuis le port série
+    while (Serial.available() > 0) {
+      char receivedChar = Serial.read();
 
-    // Ignorer les caractères d'espacement supplémentaires
-    if (receivedChar == ' ' && commandBuffer.length() == 0) {
-      continue;
-    }
-
-    // Si le caractère est un retour chariot ou un retour à la ligne
-    if (receivedChar == '\r' || receivedChar == '\n') {
-      // Vérifier si la commande est non vide
-      if (commandBuffer.length() > 0) {
-        // Traiter la commande
-        commandBuffer.trim(); // Supprimer les espaces avant et après la commande
-        if (commandBuffer == "format") {
-          if (confirmFormat()) 
-          {
-            Serial.print("start format file");
-            return 1;
-            //formatMemory();
-          } else {
-            Serial.println("Format canceled.");
-          }
-        } else if (commandBuffer == "extract")
-        {
-          Serial.println("data extract file");
-          return 2;
-          //extractData();
-        } else {
-          Serial.println("Invalid command. Type 'format' to format the flash memory or 'extract' to extract data.");
-        }
+      // Ignorer les caractères d'espacement supplémentaires
+      if (receivedChar == ' ' && commandBuffer.length() == 0) {
+        continue;
       }
-      // Réinitialiser le tampon de commande
-      commandBuffer = "";
-    } else {
-      // Ajouter le caractère au tampon de commande
-      commandBuffer += receivedChar;
+
+      // Si le caractère est un retour chariot ou un retour à la ligne
+      if (receivedChar == '\r' || receivedChar == '\n') {
+        // Vérifier si la commande est non vide
+        if (commandBuffer.length() > 0) {
+          // Traiter la commande
+          commandBuffer.trim(); // Supprimer les espaces avant et après la commande
+          if (commandBuffer == "format") {
+            if (confirmFormat()) 
+            {
+              Serial.println("start format file");
+              commandBuffer = ""; // Réinitialiser le tampon de commande
+              return 1;
+              //formatMemory();
+            } else {
+              Serial.println("Format canceled.");
+            }
+          } else if (commandBuffer == "extract")
+          {
+            Serial.println("data extract file");
+            commandBuffer = ""; // Réinitialiser le tampon de commande
+            return 2;
+            //extractData();
+          } else {
+            Serial.println("Invalid command. Type 'format' to format the flash memory or 'extract' to extract data.");
+          }
+        }
+        // Réinitialiser le tampon de commande
+        commandBuffer = "";
+      } else {
+        // Ajouter le caractère au tampon de commande
+        commandBuffer += receivedChar;
+      }
     }
   }
-return 0;
+  return 0;
 }
+
 
 extern "C"
 {
