@@ -34,6 +34,27 @@
 #define consigne_y -90
 #define consigne_z -90
 #define backup_file
+#define nb_packet 17
+typedef enum id_for_send_
+{
+  id_Packetnum = 1,
+  id_Time_ms,
+  id_TMP36_Temperature,
+  id_BMP280_Temperature,
+  id_BMP280_Pression,
+  id_BMP280_AltitudeApprox,
+  id_altitude_max,
+  id_BMx280_Hum,
+  id_ACCEL_XANGLE,
+  id_erreur_x,
+  id_x_out,
+  id_ACCEL_YANGLE,
+  id_erreur_y,
+  id_y_out,
+  id_ACCEL_ZANGLE,
+  id_erreur_z,
+  id_z_out
+} id_for_send;
 //#define printSerial_radiopack
 
 // Déclarations des variables et des fonctions externes
@@ -81,6 +102,7 @@ String creerRadioPacket(uint16_t Packetnum,unsigned long Time_ms,float TMP36_Tem
   float ACCEL_XANGLE, float erreur_x, float x_out, 
   float ACCEL_YANGLE, float erreur_y,  float y_out,
   float ACCEL_ZANGLE, float erreur_z, float z_out);
+String prep_data(int,float);
 void get_data(void);
 void buzzer_toggle(unsigned int time); // Ajout de la déclaration de la fonction buzzer_toggle
 void send_all_data(void);

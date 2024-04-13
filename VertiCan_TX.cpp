@@ -1,5 +1,9 @@
 #include "VertiCan_TX.h"
 #include "backup_managemet.h"
+
+String tableau[nb_packet +1];
+
+
 char sensor_type =0;
 float TMP36_Temperature;
 float BMx280_Hum = 0;
@@ -70,8 +74,8 @@ void send_all_data(void)
     #endif
 
     // Envoi du radiopacket à la station de base. ATTENTION : bloquant si module radio rrfm69 absent !!
-    rfm69.send((uint8_t *)(Radiopacket.c_str()), Radiopacket.length());
-    rfm69.waitPacketSent();
+    /*rfm69.send((uint8_t *)(Radiopacket.c_str()), Radiopacket.length());
+    rfm69.waitPacketSent();*/
     
 
     sendToSerial(Packetnum,Time_ms, 
@@ -212,6 +216,10 @@ char init_flash(void)
   BMx280_AltitudeApprox = BMP280.readAltitude(ALTITUDE_REF);
   return 0;
 }
+String prep_data(int data1,float data2)
+{
+  return  data1 + String(',') + data2 + String(','); //+ String((float)data1+data2);
+}
 
 String creerRadioPacket (uint16_t Packetnum,unsigned long Time_ms,float TMP36_Temperature,
   float BMP280_Temperature, float BMP280_Pression,  float BMP280_AltitudeApprox,float altitude_max, float BMx280_Hum,
@@ -219,7 +227,50 @@ String creerRadioPacket (uint16_t Packetnum,unsigned long Time_ms,float TMP36_Te
   float ACCEL_YANGLE, float erreur_y,  float y_out,
   float ACCEL_ZANGLE, float erreur_z, float z_out)
 {
-    String Radiopacket = "#" + String(Packetnum) + "," +
+  //for todo
+  tableau[0] =  String('#') + nb_packet + String(';');
+  tableau[1] =  prep_data(id_Packetnum, Packetnum);
+  tableau[2] =  prep_data(id_Time_ms, Time_ms);
+  tableau[3] =  prep_data(id_TMP36_Temperature, TMP36_Temperature);
+  tableau[4] =  prep_data(id_BMP280_Temperature, BMP280_Temperature);
+  tableau[5] =  prep_data(id_BMP280_Pression, BMP280_Pression);
+  tableau[6] =  prep_data(id_BMP280_AltitudeApprox, BMP280_AltitudeApprox);
+  tableau[7] =  prep_data(id_altitude_max, altitude_max);
+  tableau[8] =  prep_data(id_BMx280_Hum, BMx280_Hum);
+  tableau[9] =  prep_data(id_ACCEL_XANGLE, ACCEL_XANGLE);
+  tableau[10] = prep_data(id_erreur_x, erreur_x);
+  tableau[11] = prep_data(id_x_out, x_out);
+  tableau[12] = prep_data(id_ACCEL_YANGLE, ACCEL_YANGLE);
+  tableau[13] = prep_data(id_erreur_y, erreur_y);
+  tableau[14] = prep_data(id_y_out, y_out);
+  tableau[15] = prep_data(id_ACCEL_ZANGLE, ACCEL_ZANGLE);
+  tableau[16] = prep_data(id_erreur_z, erreur_z);
+  tableau[17] = prep_data(id_z_out, z_out) + String('$');
+  
+  for (char cptSend = 0; cptSend < nb_packet+1; cptSend++)
+  {  
+    rfm69.send((uint8_t *)(tableau[cptSend].c_str()), tableau[cptSend].length()); /*envois*/
+    rfm69.waitPacketSent();
+  }
+  
+  //rfm69.send((uint8_t *)(tableau[0].c_str()), tableau[0].length()); /*envois*/
+  //rfm69.waitPacketSent();
+
+
+  /*[12:18] Feliz Kapita
+sendtab[0] = '#';
+  sendtab[1] = char(255 - adc0 / 25);  //les données doivent être placé ici ...
+  sendtab[2] = char(adc1 / 25); // /25 car pas besoin de 6123 positions.
+  sendtab[3] = char(adc2 / 25);
+  sendtab[4] = char(adc6 / 25);
+  sendtab[5] = char(adc7 / 25);
+  sendtab[6] = sendtab[1] ^ sendtab[2] ^ sendtab[3] ^ sendtab[4] ^ sendtab[5];  //byte de controle d'intégrité de donnée
+ 
+  
+  
+[12:19] Feliz Kapita
+String sendtab[NB_data];*/
+    /*String Radiopacket = "#" + String(Packetnum) + "," +
                          String(Time_ms) + "," +
                          String(TMP36_Temperature) + "," +
                          String(BMP280_Temperature) + "," +
@@ -237,7 +288,7 @@ String creerRadioPacket (uint16_t Packetnum,unsigned long Time_ms,float TMP36_Te
                          String(erreur_x) + "," +
                          String(z_out) + "$,\r\n";
 
-    return Radiopacket;
+    */return Radiopacket;
 }
 char saveToFlash(uint16_t Packetnum,unsigned long Time_ms,float TMP36_Temperature,
                 float BMP280_Temperature, float BMP280_Pression, float BMP280_AltitudeApprox,float altitude_max, float BMx280_Hum, 
