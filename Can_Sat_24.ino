@@ -7,10 +7,13 @@ extern unsigned long Time_ms;  // "temps" en milliseconde depuis le dernier rese
 extern float BMx280_AltitudeApprox;  // altitude
 int compteur_regu = 0;
 int compteur_donne = 0;
+uint8_t len;
+uint8_t buf[RH_RF69_MAX_MESSAGE_LEN];
+
 
 void setup() {
+  delay(2000);
   Serial.begin(115200);
-  Serial1.begin(115200);
 
   init_backup_management();
   Wire.begin();
@@ -27,6 +30,16 @@ void setup() {
 char status = 0;
 void loop() 
 {
+  if (rfm69.available())  // Donnée présente ?
+  {
+    if (rfm69.recv(buf, &len))
+    {
+      if (!len) return;
+      len = sizeof(buf);
+      Serial.println((char*)buf);  
+    }
+
+    }
   status = backup_choice();
   if (millis() >= Time_ms + 10) {  //prends une mesure toute les 10ms
     get_data();    
@@ -62,7 +75,7 @@ void loop()
       if (compteur_donne >= 50) 
       {
         Packetnum++;
-        send_all_data();
+        //send_all_data();
         compteur_donne = 0;
       }
       break;

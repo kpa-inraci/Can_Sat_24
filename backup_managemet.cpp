@@ -13,7 +13,6 @@
 
 
 Adafruit_SPIFlash flash(&flashTransport);
-
 FatFileSystem fatfs;
 
 
@@ -107,6 +106,31 @@ void extractData() {
   }
 
 }
+
+void extractDataToBase() {
+  if (!fatfs.begin(&flash)) {
+    Serial.println("Error, failed to mount filesystem!");
+    return;
+  }
+
+File dataFile = fatfs.open(FILE_NAME, FILE_READ);
+if (dataFile) {
+  Serial.println("Opened file, printing contents below:");
+  while (dataFile.available()) {
+    char c = dataFile.read(); // Lire un caractère (type char)
+    rfm69.send((uint8_t *)&c, 1); /* Envois */
+    rfm69.waitPacketSent();
+    delayMicroseconds(10);
+    Serial.print(c);
+  }
+  dataFile.close();
+} else {
+  Serial.println("Failed to open data file! Does it exist?");
+}
+
+
+}
+
 char backup_choice() {
   static String commandBuffer = ""; // Variable statique pour stocker la commande en cours de saisie
 
