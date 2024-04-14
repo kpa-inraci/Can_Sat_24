@@ -7,6 +7,7 @@ extern unsigned long Time_ms;  // "temps" en milliseconde depuis le dernier rese
 extern float BMx280_AltitudeApprox;  // altitude
 int compteur_regu = 0;
 int compteur_donne = 0;
+int altitude_200 = 0;
 uint8_t len;
 uint8_t buf[RH_RF69_MAX_MESSAGE_LEN];
 
@@ -30,12 +31,12 @@ void setup() {
 char status = 0;
 void loop() 
 {
-  if (rfm69.available())  // Donnée présente ?
+  if (rfm69.available())  // Donnée présente ? reception données a la station de base
   {
+    len = sizeof(buf);
     if (rfm69.recv(buf, &len))
     {
       if (!len) return;
-      len = sizeof(buf);
       Serial.println((char*)buf);  
     }
 
@@ -48,6 +49,11 @@ void loop()
     compteur_donne++;
     // altitude max
   }
+  if (BMx280_AltitudeApprox >= 200)
+  {
+    altitude_200 = 1;
+  }
+
  
 
 
@@ -75,6 +81,10 @@ void loop()
       if (compteur_donne >= 50) 
       {
         Packetnum++;
+        if(altitude_200 == 1) //securité pour envoies de donnée si la cannette dépasse 200m
+        {
+          send_all_data();
+        }
         //send_all_data();
         compteur_donne = 0;
       }
