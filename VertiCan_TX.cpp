@@ -42,6 +42,13 @@ void buzzer_toggle(unsigned int time) {
   delay(time);
 }
 
+void LED_toggle(unsigned int time) {
+  digitalWrite(LED, 1);
+  delay(time);
+  digitalWrite(LED, 0);
+  delay(time);
+}
+
 void attachAndWriteServo(Servo &servo, int pin, int angle) {
   servo.attach(pin);
   servo.write(angle);

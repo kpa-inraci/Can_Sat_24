@@ -21,12 +21,15 @@ void setup() {
   attachAndWriteServo(Servomoteur2, SERVO_Pin_2, 0);
   init_flash();
   initPinIO(BUZZER_Pin, OUTPUT, LOW);
+  initPinIO(LED, OUTPUT, LOW);
   buzzer_toggle(1000);
   Time_ms = millis();
 }
 char status = 0;
 void loop() 
 {
+
+  LED_toggle(200);
   status = backup_choice();
   if (millis() >= Time_ms + 10) {  //prends une mesure toute les 10ms
     get_data();    

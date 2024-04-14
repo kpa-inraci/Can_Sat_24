@@ -34,6 +34,7 @@
 #define consigne_y -90
 #define consigne_z -90
 #define backup_file
+<<<<<<< Updated upstream
 #define nb_packet 17
 typedef enum id_for_send_
 {
@@ -55,6 +56,9 @@ typedef enum id_for_send_
   id_erreur_z,
   id_z_out
 } id_for_send;
+=======
+#define LED 13
+>>>>>>> Stashed changes
 //#define printSerial_radiopack
 
 // Déclarations des variables et des fonctions externes
@@ -106,6 +110,7 @@ String prep_data(int,float);
 void get_data(void);
 void buzzer_toggle(unsigned int time); // Ajout de la déclaration de la fonction buzzer_toggle
 void send_all_data(void);
+void LED_toggle(unsigned int time);
 
 
 #endif
