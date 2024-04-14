@@ -1,3 +1,4 @@
+#include "WString.h"
 #include "Arduino.h"
 #include "VertiCan_TX.h"
 #include "backup_managemet.h"
@@ -16,7 +17,7 @@ float erreur_y = 0;
 float erreur_z = 0;
 float altitude_max = 0;
 float ancienne_altitude = 0;  //alan altitude max alan
-unsigned long Time_ms;        // "temps" en milliseconde depuis le dernier reset du uP
+unsigned long Time_ms;  // "temps" en milliseconde depuis le dernier reset du uP
 int Packetnum = 0;            // Numéro du paquet de donnée. Sera incrémenté à chaque envoi
 String Radiopacket;           // Paquet de donnée qui sera transmis à la station de base
 
@@ -35,7 +36,8 @@ extern MPU6050 mpu;
 
 
 // Définition de la fonction buzzer_toggle
-void buzzer_toggle(unsigned int time) {
+void buzzer_toggle(unsigned int time) 
+{
   digitalWrite(BUZZER_Pin, 1);
   delay(time);
   digitalWrite(BUZZER_Pin, 0);
@@ -53,7 +55,8 @@ void initPinIO(int pin, int mode, int value) {
 }
 
 
-void send_all_data(void) {
+void send_all_data(bool activeWriteFlash) 
+{
 
   Radiopacket = creerRadioPacket(Packetnum, Time_ms,
                                  TMP36_Temperature,
@@ -63,15 +66,20 @@ void send_all_data(void) {
                                  ACCEL_ZANGLE, erreur_z, z_out);
   // Sauvegarde des mesures dans la mémoire flash
 #ifdef backup_file
-  saveToFlash(Packetnum, Time_ms,
-              TMP36_Temperature,
-              BMx280_Temperature, BMx280_Pression, BMx280_AltitudeApprox, altitude_max, BMx280_Hum,
-              ACCEL_XANGLE, erreur_x, x_out,
-              ACCEL_YANGLE, erreur_y, y_out,
-              ACCEL_ZANGLE, erreur_z, z_out);
-#else
-  Serial.println("NO Flash backUP !!!!!!!!!");
-#endif
+  if(activeWriteFlash)
+  {
+    saveToFlash(Packetnum, Time_ms,
+                TMP36_Temperature,
+                BMx280_Temperature, BMx280_Pression, BMx280_AltitudeApprox, altitude_max, BMx280_Hum,
+                ACCEL_XANGLE, erreur_x, x_out,
+                ACCEL_YANGLE, erreur_y, y_out,
+                ACCEL_ZANGLE, erreur_z, z_out);
+  }
+  else {  Serial.println("NO Flash backUP !!!!!!!!!"); }
+    
+  #else
+    Serial.println("NO Flash backUP !!!!!!!!!");
+  #endif
 
   // Envoi du radiopacket à la station de base. ATTENTION : bloquant si module radio rrfm69 absent !!
   /*rfm69.send((uint8_t *)(Radiopacket.c_str()), Radiopacket.length());
@@ -311,3 +319,94 @@ void sendToSerial(uint16_t Packetnum, unsigned long Time_ms, float TMP36_Tempera
   Serial.print(Radiopacket);
 #endif
 }
+
+char commandeReception() 
+{
+  static String commandBuffer = ""; // Variable statique pour stocker la commande en cours de saisie
+  char receivedChar;
+
+  String receivedData = rfm69Reception(); // Stocker la donnée reçue dans une variable de type String
+
+  if (strstr(receivedData.c_str(), "format") != NULL) // Recherche du mot "format" dans le tampon 
+      {
+        Serial.println("Le mot 'format' a été recu en RF!");
+        if (confirmFormat())  { return 1; } 
+      }
+
+    if (strstr(receivedData.c_str(), "extract") != NULL)  // Recherche du mot "extract" dans le tampon
+      {
+        Serial.println("Le mot 'extract' a été recu en RF!");
+        return 2;
+      }
+  
+  while (Serial.available() > 0 || commandBuffer.length() > 0 ) 
+  {
+    while (Serial.available() > 0)  // Lire les caractères disponibles depuis le port série
+    {
+      receivedChar = Serial.read();
+  
+      if (receivedChar == ' ' && commandBuffer.length() == 0)   // Ignorer les caractères d'espacement supplémentaires
+      {
+        continue;
+      }
+
+      if (receivedChar == '\r' || receivedChar == '\n')         // Si le caractère est un retour chariot ou un retour à la ligne
+      {
+        if (commandBuffer.length() > 0) // Traiter la commande // Vérifier si la commande est non vide
+        { 
+          commandBuffer.trim(); // Supprimer les espaces avant et après la commande
+          if (commandBuffer == "format") 
+          {
+            if (confirmFormat()) 
+            {
+              commandBuffer = ""; // Réinitialiser le tampon de commande
+              return 1;
+            } 
+          } 
+          else if (commandBuffer == "extract")
+          {
+            Serial.println("data extract file");
+            commandBuffer = ""; // Réinitialiser le tampon de commande
+            return 2;
+            //extractData();
+          } else 
+          {
+            Serial.println("Invalid command. Type 'format' to format the flash memory or 'extract' to extract data.");
+          }
+        }
+        commandBuffer = "";             // Réinitialiser le tampon de commande
+      } else 
+      {
+        commandBuffer += receivedChar;  // Ajouter le caractère au tampon de commande
+      }
+    }
+  }
+  return 0;
+}
+String rfm69Reception() 
+{
+  uint8_t len;
+  uint8_t buf[RH_RF69_MAX_MESSAGE_LEN];
+  
+  if (rfm69.available()) // Vérifier si des données sont disponibles
+  {
+    len = sizeof(buf);
+    if (rfm69.recv(buf, &len)) 
+    {
+      // Assurer qu'il y a des données dans le tampon
+      if (len > 0) 
+      {
+        Serial.print("donnée dans le tampon RF :");
+        Serial.println((char*)buf);  
+
+        // Convertir le tampon en une chaîne de caractères
+        buf[len] = '\0'; // Assurer que le tampon est terminé par un caractère nul pour être une chaîne valide
+        return String((char*)buf);
+      }
+    }
+  }
+  // Si aucune donnée n'est disponible, retourner une chaîne vide
+  return "";
+}
+
+

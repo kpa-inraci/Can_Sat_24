@@ -5,11 +5,16 @@ extern float erreur_x, erreur_y, erreur_z;
 extern float ACCEL_XANGLE, ACCEL_YANGLE, ACCEL_ZANGLE;
 extern unsigned long Time_ms;  // "temps" en milliseconde depuis le dernier reset du uP
 extern float BMx280_AltitudeApprox;  // altitude
+
+extern uint8_t lenBuf_rfm69;
+extern uint8_t buf_rfm69[RH_RF69_MAX_MESSAGE_LEN];
+
 int compteur_regu = 0;
 int compteur_donne = 0;
-int altitude_200 = 0;
-uint8_t len;
-uint8_t buf[RH_RF69_MAX_MESSAGE_LEN];
+bool flag_altitude_start = 0;
+bool breakWhile=0;
+
+
 
 
 void setup() {
@@ -31,17 +36,8 @@ void setup() {
 char status = 0;
 void loop() 
 {
-  if (rfm69.available())  // Donnée présente ? reception données a la station de base
-  {
-    len = sizeof(buf);
-    if (rfm69.recv(buf, &len))
-    {
-      if (!len) return;
-      Serial.println((char*)buf);  
-    }
-
-    }
-  status = backup_choice();
+  
+  status = commandeReception();
   if (millis() >= Time_ms + 10) {  //prends une mesure toute les 10ms
     get_data();    
     Time_ms = millis();
@@ -49,14 +45,12 @@ void loop()
     compteur_donne++;
     // altitude max
   }
-  if (BMx280_AltitudeApprox >= 200)
+  if (BMx280_AltitudeApprox >= altitude_start_backup)
   {
-    altitude_200 = 1;
+    flag_altitude_start = 1;
   }
 
  
-
-
   switch (status) 
   {
     case VERTICAN_format_file:
@@ -65,15 +59,15 @@ void loop()
       break;
     case VERTICAN_extract_file:
       extractData();
-    
-      while (!Serial.available())
+      
+      while (1)
       {
         for (uint8_t i = 0; i < 60; i++)
         {
           delay(5);
-          if(Serial.available())
-            break;
+          if(Serial.available()  || rfm69Reception() !="")  { breakWhile=1; break;} 
         }
+        if(breakWhile) break;   //permet de sortir de laboucle while(1)
         Serial.println("data has been extracted enter something to run");
       }
       break; 
@@ -81,11 +75,7 @@ void loop()
       if (compteur_donne >= 50) 
       {
         Packetnum++;
-        if(altitude_200 == 1) //securité pour envoies de donnée si la cannette dépasse 200m
-        {
-          send_all_data();
-        }
-        //send_all_data();
+        send_all_data(flag_altitude_start);
         compteur_donne = 0;
       }
       break;

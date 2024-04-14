@@ -15,5 +15,5 @@ bool confirmFormat(void);
 char init_backup_management(void);
 void formatMemory(void);
 void extractData(void); 
-char backup_choice(void);
+
 void extractDataToBase(void);
