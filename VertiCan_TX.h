@@ -34,8 +34,8 @@
 #define consigne_y -90
 #define consigne_z -90
 #define backup_file
-<<<<<<< Updated upstream
 #define nb_packet 17
+#define LED 13
 typedef enum id_for_send_
 {
   id_Packetnum = 1,
@@ -56,9 +56,9 @@ typedef enum id_for_send_
   id_erreur_z,
   id_z_out
 } id_for_send;
-=======
-#define LED 13
->>>>>>> Stashed changes
+
+
+
 //#define printSerial_radiopack
 
 // Déclarations des variables et des fonctions externes
