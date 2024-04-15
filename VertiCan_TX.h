@@ -33,7 +33,9 @@
 #define VERTICAN_format_file 1
 #define VERTICAN_extract_file 2
 #define VERTICAN_save_on_flash 3
-#define VERTICAN_no_backup_on_flash 0
+#define VERTICAN_no_backup_on_flash 4
+#define VERTICAN_backup_on_radio 5
+
 
 #define consigne_x 0
 #define consigne_y -90
@@ -125,7 +127,7 @@ void buzzer_toggle(unsigned int time); // Ajout de la déclaration de la fonctio
 void send_all_data(bool activeWriteFlash);
 char commandeReception(void);
 String rfm69Reception(void); 
+void send_flash_to_radio(void);
 void waitAfterExtract(void);
-
 
 #endif

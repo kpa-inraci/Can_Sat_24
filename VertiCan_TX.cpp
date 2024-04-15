@@ -331,25 +331,31 @@ char commandeReception()
   if (strstr(receivedData.c_str(), "format") != NULL) // Recherche du mot "format" dans le tampon 
       {
         Serial.println("Le mot 'format' a été recu en RF!");
-        if (confirmFormat())  { return 1; } 
+        if (confirmFormat())  { return VERTICAN_format_file; } 
       }
 
     if (strstr(receivedData.c_str(), "extract") != NULL)  // Recherche du mot "extract" dans le tampon
       {
         Serial.println("Le mot 'extract' a été recu en RF!");
-        return 2;
+        return VERTICAN_extract_file;
       }
 
       if (strstr(receivedData.c_str(), "save") != NULL)  // Recherche du mot "extract" dans le tampon
       {
         Serial.println("Le mot 'save' a été recu en RF!");
-        return 3;
+        return VERTICAN_save_on_flash;
       }
 
       if (strstr(receivedData.c_str(), "noflash") != NULL)  // Recherche du mot "extract" dans le tampon
       {
         Serial.println("Le mot 'noflash' a été recu en RF!");
-        return 3;
+        return VERTICAN_no_backup_on_flash;
+      }
+
+      if (strstr(receivedData.c_str(), "radio") != NULL)  // Recherche du mot "extract" dans le tampon
+      {
+        Serial.println("Le mot 'radio' a été recu en RF!");
+        return VERTICAN_backup_on_radio;
       }
   
   while (Serial.available() > 0 || commandBuffer.length() > 0 ) 
@@ -373,26 +379,32 @@ char commandeReception()
             if (confirmFormat()) 
             {
               commandBuffer = ""; // Réinitialiser le tampon de commande
-              return 1;
+              return VERTICAN_format_file;
             } 
           } 
           else if (commandBuffer == "extract")
           {
             Serial.println("data extract file");
             commandBuffer = ""; // Réinitialiser le tampon de commande
-            return 2;
+            return VERTICAN_extract_file;
             //extractData();
           }  
           else if (commandBuffer == "save")
           {
             commandBuffer = ""; // Réinitialiser le tampon de commande
-            return 3;
+            return VERTICAN_save_on_flash;
           }  
           else if (commandBuffer == "noflash")
           {
             commandBuffer = ""; // Réinitialiser le tampon de commande
-            return 4;
-          } else 
+            return VERTICAN_no_backup_on_flash;
+          } 
+          else if (commandBuffer == "radio")
+          {
+            commandBuffer = ""; // Réinitialiser le tampon de commande
+            return VERTICAN_backup_on_radio;
+          }
+          else 
           {
             Serial.println("Invalid command. Type 'format' to format the flash memory or 'extract' to extract data.");
           }
@@ -404,7 +416,7 @@ char commandeReception()
       }
     }
   }
-  return 0;
+  return VERTICAN_run;
 }
 String rfm69Reception() 
 {
@@ -435,6 +447,7 @@ String rfm69Reception()
 void waitAfterExtract(void)
 {
   bool breakWhile=0;
+  String message="data has been extracted enter something to run";
    while (1)
       {
         for (uint8_t i = 0; i < 60; i++)
@@ -443,8 +456,16 @@ void waitAfterExtract(void)
           if(Serial.available()  || rfm69Reception() !="")  { breakWhile=1; break;} 
         }
         if(breakWhile) break;   //permet de sortir de laboucle while(1)
-        Serial.println("data has been extracted enter something to run");
+        Serial.println(message.c_str());     //print du status sur le terminal         
+
+        rfm69.send((uint8_t *)(message.c_str()), message.length()); //permet de retrouver le status via la radio
+        rfm69.waitPacketSent();
       }
+}
+
+void send_flash_to_radio(void)
+{
+
 }
 
 

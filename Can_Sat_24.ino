@@ -57,6 +57,10 @@ void loop()
     case VERTICAN_extract_file:
       extractData();
       waitAfterExtract(); //attention blocant
+      break;
+    case VERTICAN_backup_on_radio:
+      send_flash_to_radio();
+      waitAfterExtract(); //attention blocant
       break; 
     case VERTICAN_run:
       if (compteur_donne >= 50)  //x10 ms
