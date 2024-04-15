@@ -4,7 +4,7 @@ int compteur_regu = 0;
 int compteur_donne = 0;
 bool flag_altitude_start = true; //attention a placer a zero pour le lancement ou ajouter une méthode de commande à distance
 
-int status = 0;
+int statusCommand = 0;
 
 void setup() {
   delay(2000);
@@ -26,29 +26,18 @@ void setup() {
 void loop() 
 {
   
-  status = commandeReception();
+  statusCommand = commandeReception();
   if (millis() >= Time_ms + 10) 
   {  //prends une mesure toute les 10ms
     get_data();    
     Time_ms = millis();
-    compteur_regu++;
-    compteur_donne++;
+    compteur_regu++;    compteur_donne++;
     // altitude max
   }
 
-  if (BMx280_AltitudeApprox >= altitude_start_backup || status == VERTICAN_save_on_flash)  
-    {   
-      flag_altitude_start = true;   
-      status = VERTICAN_run;  //permet de reprendre le fonctionnement normal
-    } 
-  
-  if (status == VERTICAN_no_backup_on_flash)  
-    {    
-      flag_altitude_start = false;    
-      status = VERTICAN_run; //permet de reprendre le fonctionnement normal
-    }
-  
-  switch (status) 
+  if (BMx280_AltitudeApprox >= altitude_start_backup )   flag_altitude_start = true;  
+    
+  switch (statusCommand) 
   {
     case VERTICAN_format_file:
       formatMemory();
@@ -62,6 +51,14 @@ void loop()
       send_flash_to_radio();
       waitAfterExtract(); //attention blocant
       break; 
+    case VERTICAN_no_backup_on_flash:
+      flag_altitude_start = false;    
+      statusCommand = VERTICAN_run; //permet de reprendre le fonctionnement normal
+      break;
+    case VERTICAN_save_on_flash:
+      flag_altitude_start = true;   
+      statusCommand = VERTICAN_run;  //permet de reprendre le fonctionnement normal
+      break;
     case VERTICAN_run:
       if (compteur_donne >= 50)  //x10 ms
       { 
