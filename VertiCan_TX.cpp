@@ -18,7 +18,7 @@ float erreur_z = 0;
 float altitude_max = 0;
 float ancienne_altitude = 0;  //alan altitude max alan
 unsigned long Time_ms;  // "temps" en milliseconde depuis le dernier reset du uP
-int Packetnum = 0;            // Numéro du paquet de donnée. Sera incrémenté à chaque envoi
+unsigned int Packetnum = 0;            // Numéro du paquet de donnée. Sera incrémenté à chaque envoi
 String Radiopacket;           // Paquet de donnée qui sera transmis à la station de base
 
 /*source : MPU6050.cpp*/ extern float ACCEL_XANGLE, ACCEL_YANGLE, ACCEL_ZANGLE;  //bgh Déclaration des variables globales
@@ -58,7 +58,9 @@ void initPinIO(int pin, int mode, int value) {
 void send_all_data(bool activeWriteFlash) 
 {
 
-  Radiopacket = creerRadioPacket(Packetnum, Time_ms,
+  Packetnum++; //incremente le compteur a chaque passage
+
+                  SendRadioPacket(Packetnum, Time_ms,
                                  TMP36_Temperature,
                                  BMx280_Temperature, BMx280_Pression, BMx280_AltitudeApprox, altitude_max, BMx280_Hum,
                                  ACCEL_XANGLE, erreur_x, x_out,
@@ -213,7 +215,7 @@ String prep_data(int data1, float data2) {
   return data1 + String(',') + data2 + String(',');  //+ String((float)data1+data2);
 }
 
-String creerRadioPacket(uint16_t Packetnum, unsigned long Time_ms, float TMP36_Temperature,
+void SendRadioPacket(uint16_t Packetnum, unsigned long Time_ms, float TMP36_Temperature,
                         float BMP280_Temperature, float BMP280_Pression, float BMP280_AltitudeApprox, float altitude_max, float BMx280_Hum,
                         float ACCEL_XANGLE, float erreur_x, float x_out,
                         float ACCEL_YANGLE, float erreur_y, float y_out,
@@ -244,7 +246,6 @@ String creerRadioPacket(uint16_t Packetnum, unsigned long Time_ms, float TMP36_T
     rfm69.waitPacketSent();
     delayMicroseconds(50 * sizeof(tableau));  //va niquer ta mère
   }
-  return Radiopacket;
 }
 char saveToFlash(uint16_t Packetnum, unsigned long Time_ms, float TMP36_Temperature,
                  float BMP280_Temperature, float BMP280_Pression, float BMP280_AltitudeApprox, float altitude_max, float BMx280_Hum,
@@ -338,6 +339,18 @@ char commandeReception()
         Serial.println("Le mot 'extract' a été recu en RF!");
         return 2;
       }
+
+      if (strstr(receivedData.c_str(), "save") != NULL)  // Recherche du mot "extract" dans le tampon
+      {
+        Serial.println("Le mot 'save' a été recu en RF!");
+        return 3;
+      }
+
+      if (strstr(receivedData.c_str(), "noflash") != NULL)  // Recherche du mot "extract" dans le tampon
+      {
+        Serial.println("Le mot 'noflash' a été recu en RF!");
+        return 3;
+      }
   
   while (Serial.available() > 0 || commandBuffer.length() > 0 ) 
   {
@@ -369,6 +382,16 @@ char commandeReception()
             commandBuffer = ""; // Réinitialiser le tampon de commande
             return 2;
             //extractData();
+          }  
+          else if (commandBuffer == "save")
+          {
+            commandBuffer = ""; // Réinitialiser le tampon de commande
+            return 3;
+          }  
+          else if (commandBuffer == "noflash")
+          {
+            commandBuffer = ""; // Réinitialiser le tampon de commande
+            return 4;
           } else 
           {
             Serial.println("Invalid command. Type 'format' to format the flash memory or 'extract' to extract data.");
@@ -407,6 +430,21 @@ String rfm69Reception()
   }
   // Si aucune donnée n'est disponible, retourner une chaîne vide
   return "";
+}
+
+void waitAfterExtract(void)
+{
+  bool breakWhile=0;
+   while (1)
+      {
+        for (uint8_t i = 0; i < 60; i++)
+        {
+          delay(5);
+          if(Serial.available()  || rfm69Reception() !="")  { breakWhile=1; break;} 
+        }
+        if(breakWhile) break;   //permet de sortir de laboucle while(1)
+        Serial.println("data has been extracted enter something to run");
+      }
 }
 
 

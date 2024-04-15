@@ -10,6 +10,7 @@
 #include <Servo.h>
 #include <RH_RF69.h>  // Librairie du module radio RFM69
 #include <Adafruit_BME280.h>
+#include "backup_managemet.h"
 
 #include "MPU6050.h"
 
@@ -27,15 +28,20 @@
 #define SERVO_Pin_2 12
 #define FILE_NAME "data.csv"  
 #define ALTITUDE_REF 1024.00  
+
+#define VERTICAN_run 0
 #define VERTICAN_format_file 1
 #define VERTICAN_extract_file 2
-#define VERTICAN_run 0
+#define VERTICAN_save_on_flash 3
+#define VERTICAN_no_backup_on_flash 0
+
 #define consigne_x 0
 #define consigne_y -90
 #define consigne_z -90
 #define backup_file
 #define nb_packet 17
 #define altitude_start_backup 200
+#define sendAllData 0
 typedef enum id_for_send_
 {
   id_Packetnum = 1,
@@ -63,10 +69,16 @@ extern float TMP36_Temperature, BMP280_Temperature, BMP280_Pression, BMP280_Alti
 extern float ACCEL_XANGLE, ACCEL_YANGLE, ACCEL_ZANGLE;
 extern float x_out, y_out, z_out;
 extern float erreur_x, erreur_y, erreur_z;
-extern int Packetnum;
-extern unsigned long Time_ms;
+extern unsigned int Packetnum;
+extern unsigned long Time_ms; // "temps" en milliseconde depuis le dernier reset du uP
 extern String Radiopacket;
 extern float altitude_max;
+
+extern char sensor_type;
+extern float BMx280_AltitudeApprox;  // altitude
+
+extern uint8_t lenBuf_rfm69;
+extern uint8_t buf_rfm69[RH_RF69_MAX_MESSAGE_LEN];
 
 
 
@@ -101,7 +113,7 @@ char saveToFlash  (uint16_t Packetnum, unsigned long Time_ms, float TMP36_Temper
   float ACCEL_YANGLE, float erreur_y,  float y_out,
   float ACCEL_ZANGLE, float erreur_z, float z_out);
 
-String creerRadioPacket(uint16_t Packetnum,unsigned long Time_ms,float TMP36_Temperature,
+void SendRadioPacket(uint16_t Packetnum,unsigned long Time_ms,float TMP36_Temperature,
   float BMP280_Temperature, float BMP280_Pression, float BMP280_AltitudeApprox,float altitude_max, float BMx280_Hum, 
   float ACCEL_XANGLE, float erreur_x, float x_out, 
   float ACCEL_YANGLE, float erreur_y,  float y_out,
@@ -113,5 +125,7 @@ void buzzer_toggle(unsigned int time); // Ajout de la déclaration de la fonctio
 void send_all_data(bool activeWriteFlash);
 char commandeReception(void);
 String rfm69Reception(void); 
+void waitAfterExtract(void);
+
 
 #endif

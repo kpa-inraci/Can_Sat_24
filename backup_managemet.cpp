@@ -119,7 +119,6 @@ bool confirmFormat()
           response.trim(); // Supprimer les espaces avant et après la réponse
           if (response.equalsIgnoreCase("yes")) 
           {
-            
             return true;
           } 
           else if (response.equalsIgnoreCase("no")) 
