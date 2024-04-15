@@ -68,6 +68,11 @@ void send_all_data(bool activeWriteFlash)
                                  ACCEL_ZANGLE, erreur_z, z_out);
   // Sauvegarde des mesures dans la mémoire flash
 #ifdef backup_file
+
+  #ifdef DEBUG_radio
+  Serial.printf("send_all_data -> activeWriteFlash :%d", activeWriteFlash);
+  #endif
+
   if(activeWriteFlash)
   {
     saveToFlash(Packetnum, Time_ms,
@@ -77,7 +82,12 @@ void send_all_data(bool activeWriteFlash)
                 ACCEL_YANGLE, erreur_y, y_out,
                 ACCEL_ZANGLE, erreur_z, z_out);
   }
-  else {  Serial.println("NO Flash backUP !!!!!!!!!"); }
+  else 
+  {  
+    Serial.println("NO Flash backUP !!!!!!!!!");
+    send_radio_msg("no backup on flash\n");
+    //envoyer par radio 
+  }
     
   #else
     Serial.println("NO Flash backUP !!!!!!!!!");
@@ -255,6 +265,8 @@ char saveToFlash(uint16_t Packetnum, unsigned long Time_ms, float TMP36_Temperat
   File dataFile = fatfs.open(FILE_NAME, FILE_WRITE);  // Ouvre le fichier pour l'écriture
   if (dataFile) {                                     // Vérifie si l'ouverture du fichier a réussi
     dataFile.print("#");
+    dataFile.print(nb_packet);
+    dataFile.print(",");
     dataFile.print(Packetnum);
     dataFile.print(",");
     dataFile.print(Time_ms);
@@ -340,19 +352,19 @@ char commandeReception()
         return VERTICAN_extract_file;
       }
 
-      if (strstr(receivedData.c_str(), "save") != NULL)  // Recherche du mot "extract" dans le tampon
+      if (strstr(receivedData.c_str(), "save") != NULL)  // Recherche du mot "save" dans le tampon
       {
         Serial.println("Le mot 'save' a été recu en RF!");
         return VERTICAN_save_on_flash;
       }
 
-      if (strstr(receivedData.c_str(), "noflash") != NULL)  // Recherche du mot "extract" dans le tampon
+      if (strstr(receivedData.c_str(), "noflash") != NULL)  // Recherche du mot "noflash" dans le tampon
       {
         Serial.println("Le mot 'noflash' a été recu en RF!");
         return VERTICAN_no_backup_on_flash;
       }
 
-      if (strstr(receivedData.c_str(), "radio") != NULL)  // Recherche du mot "extract" dans le tampon
+      if (strstr(receivedData.c_str(), "radio") != NULL)  // Recherche du mot "radio" dans le tampon
       {
         Serial.println("Le mot 'radio' a été recu en RF!");
         return VERTICAN_backup_on_radio;
@@ -457,15 +469,19 @@ void waitAfterExtract(void)
         }
         if(breakWhile) break;   //permet de sortir de laboucle while(1)
         Serial.println(message.c_str());     //print du status sur le terminal         
-
-        rfm69.send((uint8_t *)(message.c_str()), message.length()); //permet de retrouver le status via la radio
-        rfm69.waitPacketSent();
+        send_radio_msg(message);
       }
 }
 
 void send_flash_to_radio(void)
 {
+  // ? debut ! fin
 
 }
 
+void send_radio_msg(String message)
+{
+  rfm69.send((uint8_t *)(message.c_str()), message.length()); //permet de retrouver le status via la radio
+  rfm69.waitPacketSent();
+}
 

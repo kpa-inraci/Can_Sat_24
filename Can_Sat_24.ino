@@ -2,8 +2,7 @@
 
 int compteur_regu = 0;
 int compteur_donne = 0;
-bool flag_altitude_start = true; //attention a placer a zero pour le lancement ou ajouter une méthode de commande à distance
-
+bool flag_altitude_start = 1; //attention a placer a zero pour le lancement ou ajouter une méthode de commande à distance
 int statusCommand = 0;
 
 void setup() {
@@ -21,11 +20,16 @@ void setup() {
   initPinIO(BUZZER_Pin, OUTPUT, LOW);
   buzzer_toggle(1000);
   Time_ms = millis();
+  send_radio_msg("init done\n");
 }
 
 void loop() 
 {
-  
+  //rfm69Reception();
+  #ifdef DEBUG_radio
+  Serial.printf("loop -> flag_altitude_start :%d\n", flag_altitude_start);
+  #endif
+
   statusCommand = commandeReception();
   if (millis() >= Time_ms + 10) 
   {  //prends une mesure toute les 10ms
@@ -52,6 +56,7 @@ void loop()
       waitAfterExtract(); //attention blocant
       break; 
     case VERTICAN_no_backup_on_flash:
+      //fonction pour radio afficher !!noflash!!
       flag_altitude_start = false;    
       statusCommand = VERTICAN_run; //permet de reprendre le fonctionnement normal
       break;
