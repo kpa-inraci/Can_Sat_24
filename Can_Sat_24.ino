@@ -28,7 +28,7 @@ void loop()
   //send_radio_msg(String(Serial.read()));
   //rfm69Reception();
   #ifdef DEBUG_radio
-  Serial.printf("loop -> flag_altitude_start :%d\n", flag_altitude_start);
+    Serial.printf("loop -> flag_altitude_start :%d\n", flag_altitude_start);
   #endif
 
   statusCommand = commandeReception();
@@ -49,7 +49,6 @@ void loop()
       Packetnum = 0;
       break;
     case VERTICAN_extract_file:
-      send_flash_to_radio();
       extractData();
       waitAfterExtract(); //attention blocant
       break;

@@ -344,7 +344,7 @@ char commandeReception()
   if (strstr(receivedData.c_str(), "format") != NULL) // Recherche du mot "format" dans le tampon 
       {
         Serial.println("Le mot 'format' a été recu en RF!");
-        if (confirmFormat())  { return VERTICAN_format_file; } 
+           return VERTICAN_format_file; 
       }
 
     if (strstr(receivedData.c_str(), "extract") != NULL)  // Recherche du mot "extract" dans le tampon
