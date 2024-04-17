@@ -3,6 +3,7 @@
 #include "VertiCan_TX.h"
 #include "backup_managemet.h"
 
+
 String tableau[nb_packet + 1];
 
 
@@ -221,7 +222,8 @@ char get_BMP280(void) {
   BMx280_AltitudeApprox = BMP280.readAltitude(ALTITUDE_REF);
   return 0;
 }
-String prep_data(int data1, float data2) {
+String prep_data(int data1, float data2) 
+{
   return data1 + String(',') + data2 + String(',');  //+ String((float)data1+data2);
 }
 
@@ -230,7 +232,6 @@ void SendRadioPacket(uint16_t Packetnum, unsigned long Time_ms, float TMP36_Temp
                         float ACCEL_XANGLE, float erreur_x, float x_out,
                         float ACCEL_YANGLE, float erreur_y, float y_out,
                         float ACCEL_ZANGLE, float erreur_z, float z_out) {
-  //for todo
   tableau[0] = String('#') + nb_packet + String(';');
   tableau[1] = prep_data(id_Packetnum, Packetnum);
   tableau[2] = prep_data(id_Time_ms, Time_ms);
@@ -475,8 +476,21 @@ void waitAfterExtract(void)
 
 void send_flash_to_radio(void)
 {
-  // ? debut ! fin
+  #define FILE_NAME "data.csv"
+  File dataFile = fatfs.open(FILE_NAME, FILE_READ);
 
+    rfm69.send((uint8_t *)'?', 1); //permet de retrouver le status via la radio
+    rfm69.waitPacketSent();
+    while (dataFile.available())
+    {
+      char c = dataFile.read(); // Lire un caractère (type char)
+      rfm69.send((uint8_t *)&c, 1); /* Envois */
+      rfm69.waitPacketSent();
+      delayMicroseconds(10);
+      }
+  rfm69.send((uint8_t *)'!', 1); //permet de retrouver le status via la radio
+  rfm69.waitPacketSent();
+  // ? debut ! fin
 }
 
 void send_radio_msg(String message)
