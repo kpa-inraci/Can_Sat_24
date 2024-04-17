@@ -479,17 +479,19 @@ void send_flash_to_radio(void)
   #define FILE_NAME "data.csv"
   File dataFile = fatfs.open(FILE_NAME, FILE_READ);
 
-    rfm69.send((uint8_t *)'?', 1); //permet de retrouver le status via la radio
-    rfm69.waitPacketSent();
+    
+
+    send_radio_msg("?");
+   
     while (dataFile.available())
     {
       char c = dataFile.read(); // Lire un caractère (type char)
-      rfm69.send((uint8_t *)&c, 1); /* Envois */
-      rfm69.waitPacketSent();
-      delayMicroseconds(10);
+      String C = String(c);
+      send_radio_msg(C);
+     
       }
-  rfm69.send((uint8_t *)'!', 1); //permet de retrouver le status via la radio
-  rfm69.waitPacketSent();
+    dataFile.close();
+    send_radio_msg("!");
   // ? debut ! fin
 }
 

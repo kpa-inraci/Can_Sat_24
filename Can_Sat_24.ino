@@ -1,26 +1,49 @@
 #include "VertiCan_TX.h"
+#include <Servo.h>
+
+#define pin_servo_1 11
+#define pin_servo_2 12
 
 int compteur_regu = 0;
 int compteur_donne = 0;
 bool flag_altitude_start = 1; //attention a placer a zero pour le lancement ou ajouter une méthode de commande à distance
 int statusCommand = 0;
 
+Servo MonServo1;
+Servo MonServo2;
+
+int limite(int val, int lim_haute, int lim_basse)
+{
+  if (val > lim_haute)
+    return lim_haute;
+  else if (val < lim_basse)
+    return lim_basse;
+  else
+    return val;
+}
+
 void setup() {
   delay(2000);
   Serial.begin(115200);
+  MonServo1.attach(pin_servo_1);
+  MonServo2.attach(pin_servo_2);
 
   init_backup_management();
   Wire.begin();
   mpu.initialize();
   init_RFM69();
   sensor_type = init_BMx280();
-  attachAndWriteServo(Servomoteur1, SERVO_Pin_1, 0);
-  attachAndWriteServo(Servomoteur2, SERVO_Pin_2, 0);
+ // attachAndWriteServo(Servomoteur1, pin_servo_1, 0);
+  //attachAndWriteServo(Servomoteur2, pin_servo_2, 0);
   init_flash();
   initPinIO(BUZZER_Pin, OUTPUT, LOW);
   buzzer_toggle(1000);
   Time_ms = millis();
   send_radio_msg("init done\n");
+  MonServo1.write(90);
+  MonServo2.write(90);
+  delay(700);
+ 
 }
 
 void loop() 
@@ -77,6 +100,9 @@ void loop()
    {
     //erreur et objectif
     compteur_regu = 0;
+    MonServo1.write(limite(erreur_y, 120, 60));
+    MonServo2.write(limite(erreur_y, 120, 60));
     //regulation
   }
+
 }
