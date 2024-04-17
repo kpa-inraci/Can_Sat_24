@@ -39,8 +39,8 @@
 
 
 #define consigne_x 0
-#define consigne_y -90
-#define consigne_z -90
+#define consigne_y 0
+#define consigne_z 0
 #define backup_file
 #define nb_packet 17
 #define altitude_start_backup 500
