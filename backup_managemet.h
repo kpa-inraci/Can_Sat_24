@@ -9,6 +9,7 @@ extern Adafruit_SPIFlash flash;
 extern FatFileSystem fatfs;
 extern RH_RF69 rfm69;
 
+//extern File dataFile = fatfs.open(FILE_NAME, FILE_READ);
 #define FILE_NAME "data.csv"
 
 bool confirmFormat(void);

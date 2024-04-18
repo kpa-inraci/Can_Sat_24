@@ -3,6 +3,7 @@
 #include "VertiCan_TX.h"
 #include "backup_managemet.h"
 
+
 String tableau[nb_packet + 1];
 
 
@@ -221,7 +222,8 @@ char get_BMP280(void) {
   BMx280_AltitudeApprox = BMP280.readAltitude(ALTITUDE_REF);
   return 0;
 }
-String prep_data(int data1, float data2) {
+String prep_data(int data1, float data2) 
+{
   return data1 + String(',') + data2 + String(',');  //+ String((float)data1+data2);
 }
 
@@ -230,7 +232,6 @@ void SendRadioPacket(uint16_t Packetnum, unsigned long Time_ms, float TMP36_Temp
                         float ACCEL_XANGLE, float erreur_x, float x_out,
                         float ACCEL_YANGLE, float erreur_y, float y_out,
                         float ACCEL_ZANGLE, float erreur_z, float z_out) {
-  //for todo
   tableau[0] = String('#') + nb_packet + String(';');
   tableau[1] = prep_data(id_Packetnum, Packetnum);
   tableau[2] = prep_data(id_Time_ms, Time_ms);
@@ -343,7 +344,7 @@ char commandeReception()
   if (strstr(receivedData.c_str(), "format") != NULL) // Recherche du mot "format" dans le tampon 
       {
         Serial.println("Le mot 'format' a été recu en RF!");
-        if (confirmFormat())  { return VERTICAN_format_file; } 
+           return VERTICAN_format_file; 
       }
 
     if (strstr(receivedData.c_str(), "extract") != NULL)  // Recherche du mot "extract" dans le tampon
@@ -473,10 +474,25 @@ void waitAfterExtract(void)
       }
 }
 
-void send_flash_to_radio(void)
+int send_flash_to_radio(void)
 {
+  #define FILE_NAME "data.csv"
+  File dataFile = fatfs.open(FILE_NAME, FILE_READ);
+    send_radio_msg("?");
+    if (strstr(receivedData.c_str(), "reception_ok") != NULL)
+    {
+      while (dataFile.available())
+    {
+      char c = dataFile.read(); // Lire un caractère (type char)
+      String C = String(c);
+      send_radio_msg(C);
+     
+      }
+    dataFile.close();
+    send_radio_msg("!");
+    return 0:
   // ? debut ! fin
-
+    } else return 1;
 }
 
 void send_radio_msg(String message)

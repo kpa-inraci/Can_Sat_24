@@ -40,8 +40,8 @@
 
 
 #define consigne_x 0
-#define consigne_y -90
-#define consigne_z -90
+#define consigne_y 0
+#define consigne_z 0
 #define backup_file
 #define nb_packet 17
 #define altitude_start_backup 500
@@ -88,6 +88,8 @@ extern uint8_t buf_rfm69[RH_RF69_MAX_MESSAGE_LEN];
 
 
 
+
+
 extern Adafruit_BMP280 BMP280;
 extern FatFileSystem fatfs;
 extern Servo Servomoteur1;
@@ -112,7 +114,7 @@ void buzzer_toggle(unsigned int time); // Ajout de la déclaration de la fonctio
 void send_all_data(bool activeWriteFlash);
 char commandeReception(void);
 String rfm69Reception(void); 
-void send_flash_to_radio(void);
+int send_flash_to_radio(void);
 void waitAfterExtract(void);
 
 
