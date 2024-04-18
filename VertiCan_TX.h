@@ -12,6 +12,7 @@
 #include <Adafruit_BME280.h>
 #include "backup_managemet.h"
 
+
 #include "MPU6050.h"
 
 
@@ -70,6 +71,7 @@ typedef enum id_for_send_
 // Déclarations des variables et des fonctions externes
 extern float TMP36_Temperature, BMP280_Temperature, BMP280_Pression, BMP280_AltitudeApprox, BMx280_Hum;
 extern float ACCEL_XANGLE, ACCEL_YANGLE, ACCEL_ZANGLE;
+extern float ROT_XANGLE, ROT_YANGLE, ROT_ZANGLE; //bgh Déclaration des variables globales 
 extern float x_out, y_out, z_out;
 extern float erreur_x, erreur_y, erreur_z;
 extern unsigned int Packetnum;

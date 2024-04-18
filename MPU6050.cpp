@@ -46,6 +46,7 @@ THE SOFTWARE.
 // #define DEBUG 0  // Uncomment to enable debug output
 #endif
 float ACCEL_XANGLE, ACCEL_YANGLE, ACCEL_ZANGLE; //bgh Déclaration des variables globales 
+float ROT_XANGLE, ROT_YANGLE, ROT_ZANGLE; //bgh Déclaration des variables globales 
 float x_out,y_out,z_out;//bgh Declaration des acceleration lineaire en g
 MPU6050 mpu;
 
@@ -3487,7 +3488,9 @@ void Get_Accel_Angles() //bgh pour avoir les angles
 {
   // Lire les données de l'accéléromètre
   int16_t ax, ay, az;
+  int16_t gx, gy, gz;
   mpu.getAcceleration(&ax, &ay, &az);
+  mpu.getRotation(&gx, &gy, &gz);
  
   // Calculer les angles
   x_out = ax / 16384.0; // Conversion de l'accélération brute en g
@@ -3497,4 +3500,9 @@ void Get_Accel_Angles() //bgh pour avoir les angles
   ACCEL_XANGLE = 57.295 * atan(y_out / sqrt(pow(z_out, 2) + pow(x_out, 2)));
   ACCEL_YANGLE = 57.295 * atan(-x_out / sqrt(pow(z_out, 2) + pow(y_out, 2)));
   ACCEL_ZANGLE = 57.295 * atan(sqrt(pow(x_out, 2) + pow(y_out, 2)) / z_out);
+
+  ROT_XANGLE=gx;
+  ROT_YANGLE=gy;
+  ROT_ZANGLE=gz;
+
 }

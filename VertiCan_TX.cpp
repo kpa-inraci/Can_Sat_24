@@ -324,9 +324,9 @@ void sendToSerial(uint16_t Packetnum, unsigned long Time_ms, float TMP36_Tempera
   Serial.printf("  BMx280_Alti_max= %d", int(altitude_max));
   Serial.printf("  BMx280_Hum= %4.1f\n", BMx280_Hum);
   //angle, pid, acceleration
-  Serial.printf("Axe X:angle=%6.2f° erreur=%3.1f acc=%6.3f", ACCEL_XANGLE, erreur_x, x_out);
-  Serial.printf("  Axe Y:angle=%6.2f° erreur=%3.1f acc=%6.3f", ACCEL_YANGLE, erreur_y, y_out);
-  Serial.printf("  Axe Z:angle=%6.2f° erreur=%3.1f acc=%6.3f\n", ACCEL_ZANGLE, erreur_z, z_out);
+  Serial.printf("Axe X:angle=%6.2f° erreur=%3.1f acc=%6.3f ROT:%6.3f", ACCEL_XANGLE, erreur_x, x_out,ROT_XANGLE);
+  Serial.printf("  Axe Y:angle=%6.2f° erreur=%3.1f acc=%6.3f ROT:%6.3f", ACCEL_YANGLE, erreur_y, y_out,ROT_YANGLE);
+  Serial.printf("  Axe Z:angle=%6.2f° erreur=%3.1f acc=%6.3f ROT:%6.3f\n", ACCEL_ZANGLE, erreur_z, z_out,ROT_ZANGLE);
 #ifdef printSerial_radiopack
   Serial.print("Radiopacket : ");
   Serial.print(Radiopacket);
