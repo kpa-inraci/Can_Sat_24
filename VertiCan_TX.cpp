@@ -474,16 +474,14 @@ void waitAfterExtract(void)
       }
 }
 
-void send_flash_to_radio(void)
+int send_flash_to_radio(void)
 {
   #define FILE_NAME "data.csv"
   File dataFile = fatfs.open(FILE_NAME, FILE_READ);
-
-    
-
     send_radio_msg("?");
-   
-    while (dataFile.available())
+    if (strstr(receivedData.c_str(), "reception_ok") != NULL)
+    {
+      while (dataFile.available())
     {
       char c = dataFile.read(); // Lire un caractère (type char)
       String C = String(c);
@@ -492,7 +490,9 @@ void send_flash_to_radio(void)
       }
     dataFile.close();
     send_radio_msg("!");
+    return 0:
   // ? debut ! fin
+    } else return 1;
 }
 
 void send_radio_msg(String message)

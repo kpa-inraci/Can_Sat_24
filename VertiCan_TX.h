@@ -112,7 +112,7 @@ void buzzer_toggle(unsigned int time); // Ajout de la déclaration de la fonctio
 void send_all_data(bool activeWriteFlash);
 char commandeReception(void);
 String rfm69Reception(void); 
-void send_flash_to_radio(void);
+int send_flash_to_radio(void);
 void waitAfterExtract(void);
 
 
