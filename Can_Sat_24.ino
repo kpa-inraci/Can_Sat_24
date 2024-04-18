@@ -41,9 +41,11 @@ void setup() {
   //attachAndWriteServo(Servomoteur2, pin_servo_2, 0);
   init_flash();
   initPinIO(BUZZER_Pin, OUTPUT, LOW);
-  buzzer_toggle(1000);
+  //buzzer_toggle(1000);
   Time_ms = millis();
   send_radio_msg("init done\n");
+  MonServo1.attach(pin_servo_x);
+  MonServo2.attach(pin_servo_y);
   MonServo1.write(90);
   MonServo2.write(90);
   delay(700);
@@ -52,7 +54,8 @@ void setup() {
 
 void loop() 
 {
-  buzzer_toggle(500);
+  //buzzer_toggle(500);
+  led_toggle(200);
   //send_radio_msg(String(Serial.read()));
   //rfm69Reception();
   #ifdef DEBUG_radio
@@ -125,15 +128,15 @@ void loop()
     }
     //erreur et objectif
     compteur_regu = 0;
-    angle_moteur_x = int(erreur_x * kpx + deltax * kdx)+90;
-    angle_moteur_y = int(erreur_y * kpy + deltay * kdy)+90;
-    if (altitude_max - BMx280_AltitudeApprox >= 200)
-    {
-      MonServo1.attach(pin_servo_x);
-      MonServo2.attach(pin_servo_y);
-    }
-    MonServo1.write(limite(angle_moteur_x, 120, 60));
-    MonServo2.write(limite(angle_moteur_y, 120, 60));
+    angle_moteur_x = 90 - (int(erreur_x * kpx + deltax * kdx));
+    angle_moteur_y = (int(erreur_y * kpy + deltay * kdy)) + 90;
+    //if (altitude_max - BMx280_AltitudeApprox >= 200)
+    //{
+      
+    //}
+    MonServo1.write(limite(angle_moteur_y, 120, 60));
+    MonServo2.write(limite(angle_moteur_x, 120, 60));
+    Serial.printf("angle_moteur_y = %d angle_moteur_x = %d \n", angle_moteur_y, angle_moteur_x);
     //Serial.printf("angle_moteur_x = %d proportionnel = %f", angle_moteur_x, erreur_x * kpx);
     //Serial.printf("angle_moteur_y = %d proportionnel = %f", angle_moteur_y, erreur_y * kpy);
     //regulation

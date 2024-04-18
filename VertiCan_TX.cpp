@@ -44,15 +44,29 @@ void buzzer_toggle(unsigned int time)
   static bool flag_delay = 0;
   static bool pin_cmd=0;
 
-
-
   digitalWrite(BUZZER_Pin, pin_cmd);
- 
+
  if (millis() >= delay_toggle +time )
     {  
       delay_toggle= millis();
       pin_cmd=!pin_cmd;
       digitalWrite(BUZZER_Pin, pin_cmd);
+    }
+}
+void led_toggle(unsigned int time) 
+{
+  static unsigned long delay_toggle = millis();
+  static bool flag_delay = 0;
+  static bool pin_cmd=0;
+
+  digitalWrite(13, pin_cmd);
+
+ 
+ if (millis() >= delay_toggle +time )
+    {  
+      delay_toggle= millis();
+      pin_cmd=!pin_cmd;
+      digitalWrite(13, pin_cmd);
     }
 }
 
@@ -276,7 +290,7 @@ char saveToFlash(uint16_t Packetnum, unsigned long Time_ms, float TMP36_Temperat
                  float ACCEL_ZANGLE, float erreur_z, float z_out) {
   File dataFile = fatfs.open(FILE_NAME, FILE_WRITE);  // Ouvre le fichier pour l'écriture
   if (dataFile) {                                     // Vérifie si l'ouverture du fichier a réussi
-    dataFile.print("#");
+    //dataFile.print("#");
     dataFile.print(nb_packet);
     dataFile.print(",");
     dataFile.print(Packetnum);
@@ -471,7 +485,7 @@ String rfm69Reception()
 void waitAfterExtract(void)
 {
   bool breakWhile=0;
-  String message="data has been extracted enter something to run";
+  String message="data has been Extracted enter something to run";
    while (1)
       {
         for (uint8_t i = 0; i < 60; i++)
@@ -490,15 +504,14 @@ int send_flash_to_radio(void)
   #define FILE_NAME "data.csv"
   File dataFile = fatfs.open(FILE_NAME, FILE_READ);
     send_radio_msg("?");
-    while(1)
+    /*while(1)
     {
       if (strstr(receivedData.c_str(), "reception_ok") != NULL)
       {
         break;
       }
       delay(100);
-        Serial.println("donnee_attente");
-    }
+    }*/
       while (dataFile.available())
     {
       char c = dataFile.read(); // Lire un caractère (type char)

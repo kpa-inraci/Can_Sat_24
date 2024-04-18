@@ -19,7 +19,7 @@
 
 // Déclarations des #define originaux
 //#define DEBUG_radio
-#define RFM69_FREQ 433.0  
+#define RFM69_FREQ 444.4  
 #define RFM69_CS 6        
 #define RFM69_INT 9       
 #define RFM69_RST 10      
@@ -109,6 +109,7 @@ void send_radio_msg(String);
 String prep_data(int,float);
 void get_data(void);
 void buzzer_toggle(unsigned int time); // Ajout de la déclaration de la fonction buzzer_toggle
+void led_toggle(unsigned int time);
 void send_all_data(bool activeWriteFlash);
 char commandeReception(void);
 String rfm69Reception(void); 
