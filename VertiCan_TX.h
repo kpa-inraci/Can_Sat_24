@@ -11,7 +11,8 @@
 #include <RH_RF69.h>  // Librairie du module radio RFM69
 #include <Adafruit_BME280.h>
 #include "backup_managemet.h"
-
+#include "interrupt.h"
+#include <Servo.h>
 #include "MPU6050.h"
 
 
@@ -75,7 +76,14 @@ extern float erreur_x, erreur_y, erreur_z;
 extern unsigned int Packetnum;
 extern unsigned long Time_ms; // "temps" en milliseconde depuis le dernier reset du uP
 extern String Radiopacket;
-extern float altitude_max;
+extern float altitude_max, ancienne_altitude;
+extern int angle_moteur_x, angle_moteur_y;
+extern float deltax;
+extern float deltay;
+extern float Ay;
+extern float Ax;
+extern float Bx;
+extern float By;
 
 extern char sensor_type;
 extern float BMx280_AltitudeApprox;  // altitude
@@ -90,8 +98,8 @@ extern uint8_t buf_rfm69[RH_RF69_MAX_MESSAGE_LEN];
 
 extern Adafruit_BMP280 BMP280;
 extern FatFileSystem fatfs;
-extern Servo Servomoteur1;
-extern Servo Servomoteur2;
+extern Servo MonServo1;
+extern Servo MonServo2;
 extern MPU6050 mpu;
 
 
@@ -115,6 +123,8 @@ char commandeReception(void);
 String rfm69Reception(void); 
 int send_flash_to_radio(void);
 void waitAfterExtract(void);
+int limite(int val, int lim_haute, int lim_basse);
+
 
 
 void sendToSerial (uint16_t Packetnum,unsigned long Time_ms,float TMP36_Temperature,

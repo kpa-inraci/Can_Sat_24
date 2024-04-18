@@ -1,5 +1,4 @@
 #include "VertiCan_TX.h"
-#include <Servo.h>
 
 #define pin_servo_x 11
 #define pin_servo_y 12
@@ -14,24 +13,16 @@ float Ay;
 float Ax;
 float Bx;
 float By;
+int angle_moteur_x;
+int angle_moteur_y;
 
 Servo MonServo1;
 Servo MonServo2;
 
-int limite(int val, int lim_haute, int lim_basse)
-{
-  if (val > lim_haute)
-    return lim_haute;
-  else if (val < lim_basse)
-    return lim_basse;
-  else
-    return val;
-}
-
 void setup() {
   delay(2000);
   Serial.begin(115200);
-
+  
   init_backup_management();
   Wire.begin();
   mpu.initialize();
@@ -48,14 +39,16 @@ void setup() {
   MonServo2.attach(pin_servo_y);
   MonServo1.write(90);
   MonServo2.write(90);
-  delay(700);
+  //delay(700);
+  init_interrupt(10.0);
+  TimerCallback0();
  
 }
 
 void loop() 
 {
   //buzzer_toggle(500);
-  led_toggle(200);
+  //led_toggle(200);
   //send_radio_msg(String(Serial.read()));
   //rfm69Reception();
   #ifdef DEBUG_radio
@@ -107,38 +100,13 @@ void loop()
   }
    if (compteur_regu >= 10) //x10ms
    {
-    int angle_moteur_x = 0;
-    int angle_moteur_y = 0;
-    
-    float kpx = 0.8;
-    float kdx = 0;
-    float kpy = 0.8;
-    float kdy = 0;
-    bool boolele = 0;
-    if (boolele)
-    {//todo corriger pid facteur d
-      Ax = erreur_x;
-      Ay = erreur_y;
-    }
-    else{
-      Bx = erreur_x;
-      By = erreur_y;
-      deltax = Ax - Bx;
-      deltay = Ay - By;
-    }
-    //erreur et objectif
-    compteur_regu = 0;
-    angle_moteur_x = 90 - (int(erreur_x * kpx + deltax * kdx));
-    angle_moteur_y = (int(erreur_y * kpy + deltay * kdy)) + 90;
+    Serial.printf("erreur dx =%f  erreur dy =%f\n", deltax, deltay);
     //if (altitude_max - BMx280_AltitudeApprox >= 200)
     //{
       
     //}
-    MonServo1.write(limite(angle_moteur_y, 120, 60));
-    MonServo2.write(limite(angle_moteur_x, 120, 60));
-    Serial.printf("angle_moteur_y = %d angle_moteur_x = %d \n", angle_moteur_y, angle_moteur_x);
-    //Serial.printf("angle_moteur_x = %d proportionnel = %f", angle_moteur_x, erreur_x * kpx);
-    //Serial.printf("angle_moteur_y = %d proportionnel = %f", angle_moteur_y, erreur_y * kpy);
+    
+    //Serial.printf("angle_moteur_y = %d angle_moteur_x = %d cpt = %d\n", angle_moteur_y, angle_moteur_x, cpt);
     //regulation
   }
 

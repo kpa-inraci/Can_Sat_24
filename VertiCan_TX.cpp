@@ -341,18 +341,18 @@ void sendToSerial(uint16_t Packetnum, unsigned long Time_ms, float TMP36_Tempera
                   float ACCEL_YANGLE, float erreur_y, float y_out,
                   float ACCEL_ZANGLE, float erreur_z, float z_out) {
   //temperature, pression, humidité, altitude
-  Serial.printf("Packet :%8d", Packetnum);
-  Serial.printf(" Time_ms :%8d", Time_ms);
-  Serial.printf(" TMP36_T°= %4.1f", TMP36_Temperature);
-  Serial.printf("  BMx280_T°= %4.1f", BMP280_Temperature);
-  Serial.printf("  BMx280_P°= %10.3fPa", BMP280_Pression);
-  Serial.printf("  BMx280_Alti= %6.2fm", BMP280_AltitudeApprox);
-  Serial.printf("  BMx280_Alti_max= %d", int(altitude_max));
-  Serial.printf("  BMx280_Hum= %4.1f\n", BMx280_Hum);
+  Serial.printf("Pkt:%8d", Packetnum);
+  Serial.printf(" Tms:%8d", Time_ms);
+  Serial.printf(" aT°= %4.1f", TMP36_Temperature);
+  Serial.printf("  nT°= %4.1f", BMP280_Temperature);
+  Serial.printf("  P°= %10.3fPa", BMP280_Pression);
+  Serial.printf("  Alt= %6.2fm", BMP280_AltitudeApprox);
+  Serial.printf("  Alt_max= %d", int(altitude_max));
+  Serial.printf("  Hum= %4.1f\n", BMx280_Hum);
   //angle, pid, acceleration
-  Serial.printf("Axe X:angle=%6.2f° erreur=%3.1f acc=%6.3f", ACCEL_XANGLE, erreur_x, x_out);
-  Serial.printf("  Axe Y:angle=%6.2f° erreur=%3.1f acc=%6.3f", ACCEL_YANGLE, erreur_y, y_out);
-  Serial.printf("  Axe Z:angle=%6.2f° erreur=%3.1f acc=%6.3f\n", ACCEL_ZANGLE, erreur_z, z_out);
+  Serial.printf("X:%6.2f° Er:%3.1f ax%6.3f", ACCEL_XANGLE, erreur_x, x_out);
+  Serial.printf("Y:%6.2f° Er:%3.1f ay%6.3f", ACCEL_YANGLE, erreur_y, y_out);
+  Serial.printf("Z:%6.2f° Er:%3.1f az%6.3f\n", ACCEL_ZANGLE, erreur_z, z_out);
 #ifdef printSerial_radiopack
   Serial.print("Radiopacket : ");
   Serial.print(Radiopacket);
@@ -529,5 +529,15 @@ void send_radio_msg(String message)
 {
   rfm69.send((uint8_t *)(message.c_str()), message.length()); //permet de retrouver le status via la radio
   rfm69.waitPacketSent();
+}
+
+int limite(int val, int lim_haute, int lim_basse)
+{
+  if (val > lim_haute)
+    return lim_haute;
+  else if (val < lim_basse)
+    return lim_basse;
+  else
+    return val;
 }
 
