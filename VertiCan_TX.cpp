@@ -21,6 +21,7 @@ float ancienne_altitude = 0;  //alan altitude max alan
 unsigned long Time_ms;  // "temps" en milliseconde depuis le dernier reset du uP
 unsigned int Packetnum = 0;            // Numéro du paquet de donnée. Sera incrémenté à chaque envoi
 String Radiopacket;           // Paquet de donnée qui sera transmis à la station de base
+String receivedData; // Stocker la donnée reçue dans une variable de type String
 
 /*source : MPU6050.cpp*/ extern float ACCEL_XANGLE, ACCEL_YANGLE, ACCEL_ZANGLE;  //bgh Déclaration des variables globales
 /*source : MPU6050.cpp*/ extern float x_out, y_out, z_out;                       //bgh Declaration des acceleration lineaire en g
@@ -39,10 +40,20 @@ extern MPU6050 mpu;
 // Définition de la fonction buzzer_toggle
 void buzzer_toggle(unsigned int time) 
 {
-  digitalWrite(BUZZER_Pin, 1);
-  delay(time);
-  digitalWrite(BUZZER_Pin, 0);
-  delay(time);
+  static unsigned long delay_toggle = millis();
+  static bool flag_delay = 0;
+  static bool pin_cmd=0;
+
+
+
+  digitalWrite(BUZZER_Pin, pin_cmd);
+ 
+ if (millis() >= delay_toggle +time )
+    {  
+      delay_toggle= millis();
+      pin_cmd=!pin_cmd;
+      digitalWrite(BUZZER_Pin, pin_cmd);
+    }
 }
 
 void attachAndWriteServo(Servo &servo, int pin, int angle) {
@@ -479,8 +490,15 @@ int send_flash_to_radio(void)
   #define FILE_NAME "data.csv"
   File dataFile = fatfs.open(FILE_NAME, FILE_READ);
     send_radio_msg("?");
-    if (strstr(receivedData.c_str(), "reception_ok") != NULL)
+    while(1)
     {
+      if (strstr(receivedData.c_str(), "reception_ok") != NULL)
+      {
+        break;
+      }
+      delay(100);
+        Serial.println("donnee_attente");
+    }
       while (dataFile.available())
     {
       char c = dataFile.read(); // Lire un caractère (type char)
@@ -490,9 +508,8 @@ int send_flash_to_radio(void)
       }
     dataFile.close();
     send_radio_msg("!");
-    return 0:
+    return 0;
   // ? debut ! fin
-    } else return 1;
 }
 
 void send_radio_msg(String message)

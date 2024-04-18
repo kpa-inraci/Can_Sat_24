@@ -6,7 +6,7 @@
 
 int compteur_regu = 0;
 int compteur_donne = 0;
-bool flag_altitude_start = 1; //attention a placer a zero pour le lancement ou ajouter une méthode de commande à distance
+bool flag_altitude_start = 0; //attention a placer a zero pour le lancement ou ajouter une méthode de commande à distance
 int statusCommand = 0;
 float deltax;
 float deltay;
@@ -31,8 +31,6 @@ int limite(int val, int lim_haute, int lim_basse)
 void setup() {
   delay(2000);
   Serial.begin(115200);
-  MonServo1.attach(pin_servo_x);
-  MonServo2.attach(pin_servo_y);
 
   init_backup_management();
   Wire.begin();
@@ -54,6 +52,7 @@ void setup() {
 
 void loop() 
 {
+  buzzer_toggle(500);
   //send_radio_msg(String(Serial.read()));
   //rfm69Reception();
   #ifdef DEBUG_radio
@@ -114,7 +113,7 @@ void loop()
     float kdy = 0;
     bool boolele = 0;
     if (boolele)
-    {
+    {//todo corriger pid facteur d
       Ax = erreur_x;
       Ay = erreur_y;
     }
@@ -128,10 +127,15 @@ void loop()
     compteur_regu = 0;
     angle_moteur_x = int(erreur_x * kpx + deltax * kdx)+90;
     angle_moteur_y = int(erreur_y * kpy + deltay * kdy)+90;
+    if (altitude_max - BMx280_AltitudeApprox >= 200)
+    {
+      MonServo1.attach(pin_servo_x);
+      MonServo2.attach(pin_servo_y);
+    }
     MonServo1.write(limite(angle_moteur_x, 120, 60));
     MonServo2.write(limite(angle_moteur_y, 120, 60));
-    Serial.printf("angle_moteur_x = %d proportionnel = %f", angle_moteur_x, erreur_x * kpx);
-    Serial.printf("angle_moteur_y = %d proportionnel = %f", angle_moteur_y, erreur_y * kpy);
+    //Serial.printf("angle_moteur_x = %d proportionnel = %f", angle_moteur_x, erreur_x * kpx);
+    //Serial.printf("angle_moteur_y = %d proportionnel = %f", angle_moteur_y, erreur_y * kpy);
     //regulation
   }
 
