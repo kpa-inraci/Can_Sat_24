@@ -20,14 +20,14 @@
 
 // Déclarations des #define originaux
 //#define DEBUG_radio
-#define RFM69_FREQ 444.4  
+#define RFM69_FREQ 434.2  
 #define RFM69_CS 6        
 #define RFM69_INT 9       
 #define RFM69_RST 10      
 #define TMP36_Pin A3
 #define BUZZER_Pin A5
-#define SERVO_Pin_1 11
-#define SERVO_Pin_2 12
+#define pin_servo_x 11
+#define pin_servo_y 12
 #define FILE_NAME "data.csv"  
 #define ALTITUDE_REF 1024.00  
 
@@ -37,7 +37,6 @@
 #define VERTICAN_save_on_flash 3
 #define VERTICAN_no_backup_on_flash 4
 #define VERTICAN_backup_on_radio 5
-
 
 #define consigne_x 0
 #define consigne_y 0

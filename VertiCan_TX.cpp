@@ -280,7 +280,7 @@ void SendRadioPacket(uint16_t Packetnum, unsigned long Time_ms, float TMP36_Temp
   for (char cptSend = 0; cptSend < nb_packet + 1; cptSend++) {
     rfm69.send((uint8_t *)(tableau[cptSend].c_str()), tableau[cptSend].length()); /*envois*/
     rfm69.waitPacketSent();
-    delayMicroseconds(50 * sizeof(tableau));  //va niquer ta mère
+    delayMicroseconds(50 * sizeof(tableau)); //delay pour la
   }
 }
 char saveToFlash(uint16_t Packetnum, unsigned long Time_ms, float TMP36_Temperature,

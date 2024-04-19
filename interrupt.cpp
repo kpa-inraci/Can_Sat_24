@@ -16,6 +16,12 @@ void TC5_Handler()
   Adafruit_ZeroTimer::timerHandler(5);
 }
 
+// Fonction pour appliquer le filtre exponentiel
+float smoothFilter(float current_angle, float last_filtered_angle) {
+    const float alpha = 0.8;
+    float filtered_angle = alpha * current_angle + (1 - alpha) * last_filtered_angle;
+    return filtered_angle;
+}
 
 // the timer callback
 volatile bool togglepin = false;
@@ -24,11 +30,13 @@ void TimerCallback0(void)
       angle_moteur_x = 0;
     angle_moteur_y = 0;
     
-    float kpx = 0.9;
-    float kdx = 0.1;
-    float kpy = 0.9;
-    float kdy = 0.1;
+    float kpx = 0.65;
+    float kdx = 0.25;
+    float kpy = 0.65;
+    float kdy = 0.25;
     static bool boolele = 0;
+    static float ancien_angle_moteur_y;
+    static float ancien_angle_moteur_x;
     if (boolele)
     {//todo corriger pid facteur d
       boolele = 0;
@@ -45,10 +53,40 @@ void TimerCallback0(void)
     }
     //erreur et objectif
     //compteur_regu = 0;
-    angle_moteur_x = 90 - (int(erreur_x * kpx + (deltax * kdx)));
-    angle_moteur_y = (int(erreur_y * kpy + (deltay * kdy))) + 90;
-  MonServo1.write(limite(angle_moteur_y, 120, 60));
-  MonServo2.write(limite(angle_moteur_x, 120, 60));
+
+// Filtrer les changements brusques d'angle
+// Définition des constantes pour le filtre
+float last_filtered_angle_x = 90;
+float last_filtered_angle_y = 90;
+
+
+
+// Fonction pour limiter les valeurs entre deux bornes
+
+// À l'intérieur de votre boucle principale ou de votre routine d'interruption :
+// Appliquer le filtre à l'angle de moteur x et y
+angle_moteur_x = 90 - (int)(erreur_x * kpx + deltax * kdx);
+angle_moteur_y = (int)(erreur_y * kpy + deltay * kdy) + 90;
+
+float filtered_angle_x = smoothFilter(angle_moteur_x, last_filtered_angle_x);
+float filtered_angle_y = smoothFilter(angle_moteur_y, last_filtered_angle_y);
+
+// Écrire les angles filtrés sur les servomoteurs en respectant les limites
+MonServo1.write(limite((int)filtered_angle_y, 120, 60));
+MonServo2.write(limite((int)filtered_angle_x, 120, 60));
+
+// Mettre à jour les variables pour la prochaine itération
+last_filtered_angle_x = filtered_angle_x;
+last_filtered_angle_y = filtered_angle_y;
+
+// Calculer les nouveaux angles
+// Limiter les angles dans une plage acceptable
+//int angle_limite_x = limite(angle_moteur_x, 120, 60);
+//int angle_limite_y = limite(angle_moteur_y, 120, 60);
+
+// Mettre à jour les servomoteurs avec les angles limités
+
+
 }
 
 void init_interrupt(float freq)

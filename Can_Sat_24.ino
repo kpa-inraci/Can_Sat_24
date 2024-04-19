@@ -1,7 +1,7 @@
 #include "VertiCan_TX.h"
 
-#define pin_servo_x 11
-#define pin_servo_y 12
+//#define DEBUG_servo
+#define DEBUG_fly_mode
 
 int compteur_regu = 0;
 int compteur_donne = 0;
@@ -28,43 +28,53 @@ void setup() {
   mpu.initialize();
   init_RFM69();
   sensor_type = init_BMx280();
- // attachAndWriteServo(Servomoteur1, pin_servo_1, 0);
-  //attachAndWriteServo(Servomoteur2, pin_servo_2, 0);
-  init_flash();
   initPinIO(BUZZER_Pin, OUTPUT, LOW);
-  //buzzer_toggle(1000);
+  buzzer_toggle(1000);
   Time_ms = millis();
   send_radio_msg("init done\n");
-  MonServo1.attach(pin_servo_x);
-  MonServo2.attach(pin_servo_y);
   MonServo1.write(90);
   MonServo2.write(90);
   //delay(700);
-  init_interrupt(10.0);
+  init_interrupt(20.0);
   TimerCallback0();
+  init_flash(); //WARNING!!!!!!!!!!!!! a initialiser après l'interruption
  
 }
 
 void loop() 
 {
-  //buzzer_toggle(500);
-  //led_toggle(200);
+    #ifdef DEBUG_servo
+      {
+        MonServo1.attach(pin_servo_x);
+        MonServo2.attach(pin_servo_y); 
+      }
+    #else
+          if (altitude_max - BMx280_AltitudeApprox >= 100)
+      {
+        MonServo1.attach(pin_servo_x);
+        MonServo2.attach(pin_servo_y);
+      }
+    #endif
+    #ifdef DEBUG_fly_mode
+      buzzer_toggle(500);
+    #endif
+  led_toggle(200);
   //send_radio_msg(String(Serial.read()));
   //rfm69Reception();
-  #ifdef DEBUG_radio
-    Serial.printf("loop -> flag_altitude_start :%d\n", flag_altitude_start);
-  #endif
+    #ifdef DEBUG_radio
+      Serial.printf("loop -> flag_altitude_start :%d\n", flag_altitude_start);
+    #endif
 
   statusCommand = commandeReception();
-  if (millis() >= Time_ms + 10) 
-  {  //prends une mesure toute les 10ms
-    get_data();
-    Time_ms = millis();
-    compteur_regu++;    compteur_donne++;
+    if (millis() >= Time_ms + 10) 
+    {  //prends une mesure toute les 10ms
+      get_data();
+      Time_ms = millis();
+      compteur_regu++;    compteur_donne++;
     // altitude max
-  }
+    }
 
-  if (BMx280_AltitudeApprox >= altitude_start_backup )   flag_altitude_start = true;  
+    if (BMx280_AltitudeApprox >= altitude_start_backup )   flag_altitude_start = true;  
     
   switch (statusCommand) 
   {
@@ -98,16 +108,4 @@ void loop()
       }
       break;
   }
-   if (compteur_regu >= 10) //x10ms
-   {
-    Serial.printf("erreur dx =%f  erreur dy =%f\n", deltax, deltay);
-    //if (altitude_max - BMx280_AltitudeApprox >= 200)
-    //{
-      
-    //}
-    
-    //Serial.printf("angle_moteur_y = %d angle_moteur_x = %d cpt = %d\n", angle_moteur_y, angle_moteur_x, cpt);
-    //regulation
-  }
-
 }
