@@ -1,7 +1,7 @@
 #include "VertiCan_TX.h"
 
-//#define DEBUG_servo
-#define DEBUG_fly_mode
+#define DEBUG_servo
+//#define DEBUG_fly_mode
 
 int compteur_regu = 0;
 int compteur_donne = 0;
